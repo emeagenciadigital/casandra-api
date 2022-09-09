@@ -1,0 +1,77 @@
+{
+  "host": "0.0.0.0",
+  "port": 3030,
+  "public": "../public/",
+  "paginate": {
+    "default": 10,
+    "max": 50
+  },
+  "wompi": {
+    "public_key": "pub_test_YOQAmqgIQqLRGG5xq0Gqmr16CiN8Y8yZ_deprecated",
+    "private_key": "prv_test_NwNcpbTkxadL9tLv9uGPy7uAqdmtQ24k_deprecated",
+    "events_secret": "test_events_TIbaO8hnDJpLTy7uVADApDclCLjLOLkB_deprecated",
+    "integrity_secret": "test_integrity_LesjNrJB3zuVMawf4zPpbyyusLm5wRxc_deprecated",
+    "url_base": "https://sandbox.wompi.co/v1",
+    "test": "true"
+  },
+  "algolia": {
+    "appId": "87PMVY6KUZ_deprecated",
+    "apiKey": "d58851459b39dc341f46dc6a9289c7f1_deprecated"
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "7m9BQMAHNVCNIfBUkordr/ZQEvU=",
+    "authStrategies": [
+      "jwt",
+      "local",
+      "facebook",
+      "sms",
+      "email",
+      "checkout"
+    ],
+    "path": "/authentication",
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://new.almacensandra.com.co/",
+      "issuer": "feathers",
+      "algorithm": "HS256",
+      "expiresIn": "1000d"
+    },
+    "local": {
+      "usernameField": "email",
+      "passwordField": "password"
+    },
+    "sms": {
+      "usernameField": "phone",
+      "passwordField": "token_login_phone"
+    },
+    "email": {
+      "usernameField": "email",
+      "passwordField": "token_login_email"
+    },
+    "checkout": {
+      "usernameField": "email",
+      "passwordField": "ignore"
+    },
+    "oauth": {
+      "facebook": {
+        "key": "1494933113998086",
+        "secret": "b11301d5f01e8203661b1a48df57befe",
+        "scope": [
+          "email, public_profile"
+        ]
+      }
+    }
+  },
+  "mailjet": {
+    "apiKey": "6e8c319aa5adf18d63ffb2b08d4c5b9f",
+    "secretKey": "a4f2f1244122be7ccd1dca7267788a17"
+  },
+  "mysql": {
+    "client": "mysql",
+    "connection": "mysql://casandramysql:%3FpJ841rj@44.209.233.61:3306/casandra"
+  }
+}
