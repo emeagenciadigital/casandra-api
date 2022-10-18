@@ -36,7 +36,7 @@ module.exports = async context => {
         },
         shipping_address: {
           address_line_1: shipping_address.address,
-          address_line_2: shipping_address.details,
+//           address_line_2: shipping_address.details,
           country: "CO",
           region: shipping_address.state_name,
           city: shipping_address.city_name,
