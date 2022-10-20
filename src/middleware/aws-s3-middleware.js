@@ -4,7 +4,7 @@ module.exports = () => {
   return function awsS3Middleware(...params) {
     const [req] = params;
     return s3router({
-      bucket: "todoensoldaduras",
+      bucket: "casandra-static",
       region: "us-east-1",
       signatureVersion: "v4",
       headers: {
@@ -15,7 +15,7 @@ module.exports = () => {
         "Access-Control-Allow-Headers":
           "X-Requested-With,Content-Type,Cache-Control",
       },
-      // ACL: "public-read",
+      ACL: "public-read",
       uniquePrefix: true,
     })(...params);
   };
