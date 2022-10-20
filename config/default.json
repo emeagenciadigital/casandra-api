@@ -71,7 +71,7 @@
     "secretKey": "a4f2f1244122be7ccd1dca7267788a17"
   },
   "meilisearch": {
-    "url": "https://meilisearch.almacensandra.com.co",
+    "url": "https://search.almacensandra.com.co",
     "index": "search",
     "key": "975875040ee7fb9a67162fec70f09a2ca563bbb3c9805de7784bde1eb436ebed"
   },

@@ -1,12 +1,12 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 const { getItems, replaceItems } = require('feathers-hooks-common');
-const { NotFound, NotAcceptable } = require('@feathersjs/errors');
-const { parseInt } = require('lodash');
+// const { NotFound, NotAcceptable } = require('@feathersjs/errors');
+// const { parseInt } = require('lodash');
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
   return async (context) => {
-    const { user } = context.params;
+    // const { user } = context.params;
 
     const records = getItems(context);
 
