@@ -15,7 +15,7 @@ module.exports = () => {
         "Access-Control-Allow-Headers":
           "X-Requested-With,Content-Type,Cache-Control",
       },
-      ACL: "public-read",
+      // ACL: "public-read",
       uniquePrefix: true,
     })(...params);
   };
