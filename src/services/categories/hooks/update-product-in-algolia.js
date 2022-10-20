@@ -23,7 +23,7 @@ module.exports = (options = {}) => {
       })
       .then((it) => it.data);
 
-    await batchUpdateExpressProductsAlgolia(products, "products")(context);
+    context.app.service('meilisearch').create(products)
 
     replaceItems(context, records);
 

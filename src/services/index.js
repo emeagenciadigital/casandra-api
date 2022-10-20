@@ -58,7 +58,7 @@ const discounts = require('./discounts/discounts.service.js');
 const dicountConditions = require('./dicount_conditions/dicount_conditions.service.js');
 const paymentConfirmations = require('./payment-confirmations/payment-confirmations.service.js');
 const wompiTokenizeCreditCard = require('./wompi-tokenize-credit-card/wompi-tokenize-credit-card.service.js');
-
+const meilisearch = require('./meilisearch/meilisearch.service')
 const createProcessPayment = require('./create-process-payment/create-process-payment.service.js');
 
 const wompiGenerateMerchant = require('./wompi-generate-merchant/wompi-generate-merchant.service.js');
@@ -132,4 +132,5 @@ module.exports = function (app) {
   app.configure(wompiGenerateMerchant);
   app.configure(wompiPseBanks);
   app.configure(wompiWebhookEvents);
+  app.configure(meilisearch);
 };

@@ -18,6 +18,9 @@ const channels = require("./channels");
 const authentication = require("./authentication");
 
 const objection = require("./objection");
+const WompiClass = require('./utils/wompi/Wompi.class');
+const meilisearch = require("./meilisearch");
+const sequelize = require("./sequelize");
 
 const app = express(feathers());
 
@@ -38,6 +41,7 @@ app.configure(express.rest());
 app.configure(socketio());
 
 app.configure(objection);
+app.configure(sequelize)
 
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
@@ -51,10 +55,12 @@ app.configure(channels);
 app.use(express.notFound());
 app.use(express.errorHandler({ logger }));
 
+// Meilisearch
+app.configure(meilisearch)
+
 app.hooks(appHooks);
 
 // Wompi class
-const WompiClass = require('./utils/wompi/Wompi.class')
 const wompi = new WompiClass(app)
 
 app.set('wompiClient', wompi)

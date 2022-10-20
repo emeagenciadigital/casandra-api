@@ -1,7 +1,7 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 const { NotAcceptable } = require('@feathersjs/errors');
-const algolia = require('../../../utils/algolia/');
+// const algolia = require('../../../utils/algolia/');
 
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
@@ -32,15 +32,16 @@ module.exports = (options = {}) => {
       .whereNot('deletedAt', null)
       .then((it) => it[0]);
 
-    const algoliaCredemtials = context.app.get('algolia');
+    // const algoliaCredemtials = context.app.get('algolia');
 
-    const Algolia = new algolia(
-      'products',
-      algoliaCredemtials.appId,
-      algoliaCredemtials.apiKey
-    );
+    // const Algolia = new algolia(
+    //   'products',
+    //   algoliaCredemtials.appId,
+    //   algoliaCredemtials.apiKey
+    // );
 
-    Algolia.remove(record.id);
+    // Algolia.remove(record.id);
+    context.app.service('meilisearch').remove(record.id)
 
     context.result = record;
     return context;

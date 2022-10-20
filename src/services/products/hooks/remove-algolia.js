@@ -1,25 +1,27 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 const {
-  checkContext,
+  // checkContext,
   getItems,
   replaceItems
 } = require("feathers-hooks-common");
-const algolia = require("../../../utils/algolia/");
+// const algolia = require("../../../utils/algolia/");
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}, index) => {
   return async context => {
     let records = getItems(context);
 
-    const algoliaCredemtials = context.app.get("algolia");
+    // const algoliaCredemtials = context.app.get("algolia");
 
-    const Algolia = new algolia(
-      "expressProducts",
-      algoliaCredemtials.appId,
-      algoliaCredemtials.apiKey
-    );
+    // const Algolia = new algolia(
+    //   "expressProducts",
+    //   algoliaCredemtials.appId,
+    //   algoliaCredemtials.apiKey
+    // );
 
-    Algolia.remove(context.id);
+    // Algolia.remove(context.id);
+
+    context.app.service('meilisearch').remove(context.id)
 
     replaceItems(context, records);
 

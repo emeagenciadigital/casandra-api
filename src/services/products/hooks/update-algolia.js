@@ -6,7 +6,7 @@ const {
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
-const algolia = require("../../../utils/algolia");
+// const algolia = require("../../../utils/algolia");
 
 async function getCategories(context, categories, categoryId) {
   if (categoryId != 1) {
@@ -46,14 +46,16 @@ module.exports = function (options = {}) {
     // Get the record(s) from context.data (before), context.result.data or context.result (after).
     // getItems always returns an array to simplify your processing.
     let records = getItems(context);
- 
-    const algoliaCredemtials = context.app.get("algolia");
 
-    const Algolia = new algolia(
-      "products",
-      algoliaCredemtials.appId,
-      algoliaCredemtials.apiKey
-    );
+    // const algoliaCredemtials = context.app.get("algolia");
+
+    // const Algolia = new algolia(
+    //   "products",
+    //   algoliaCredemtials.appId,
+    //   algoliaCredemtials.apiKey
+    // );
+
+    const meilisearch = context.app.service('meilisearch')
 
     if (records.length > 0) {
       records = records[0];
@@ -98,9 +100,10 @@ module.exports = function (options = {}) {
         .substr(1, records.category_path_ids.length - 2)
         .split("-");
 
-      Algolia.save(records);
+      // Algolia.save(records);
+      meilisearch.patch(records)
     } else if (records.status == "inactive") {
-      Algolia.remove(records.id);
+      meilisearch.remove(records.id);
     }
 
     // Place the modified records back in the context.
