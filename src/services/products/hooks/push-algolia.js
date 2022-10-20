@@ -35,7 +35,7 @@ module.exports = function (options = {}) {
       // records.objectID = records.id;
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       records.updatedAtUnix = Math.floor(records.updatedAt / 1000);
-      context.app.service('meilisearch').patch(records)
+      context.app.service('meilisearch').patch(null, records)
       // Algolia.create(records);
     }
 

@@ -1,4 +1,4 @@
-const algolia = require("../utils/algolia");
+// const algolia = require("../utils/algolia");
 
 const fromLabel = async (label_id, context) => {
 	const labelsModel = context.app.service('labels').getModel()
@@ -10,7 +10,7 @@ const fromLabel = async (label_id, context) => {
 			.then((it) => it.length ? it[0] : undefined),
 		labelsConditionsModel.query()
 			.where({ label_id, deletedAt: null })
-	]) 
+	])
 
 	if (!label || !conditions.length) return context;
 
@@ -38,24 +38,24 @@ const fromLabel = async (label_id, context) => {
 			${updateFieldsProduct}
 			WHERE
 				products.deletedAt IS NULL
-				${cProduct.length ? `AND products.id NOT IN (${ cProduct.map(it => it.product_id).join(',') })` : ''}
+				${cProduct.length ? `AND products.id NOT IN (${cProduct.map(it => it.product_id).join(',')})` : ''}
 		`)
 
 		const updatedIds = await knex.raw(`
-			SELECT products.id FROM products WHERE products.deletedAt IS NULL ${cProduct.length ? `AND products.id NOT IN (${ cProduct.map(it => it.product_id).join(',') })` : ''}
+			SELECT products.id FROM products WHERE products.deletedAt IS NULL ${cProduct.length ? `AND products.id NOT IN (${cProduct.map(it => it.product_id).join(',')})` : ''}
 		`).then(res => res.length ? res[0].map(it => it.id) : [])
 
 		if (!updatedIds.length) return context
 
-		const algoliaCredemtials = context.app.get("algolia");
-		const Algolia = new algolia(
-			'products',
-			algoliaCredemtials.appId,
-			algoliaCredemtials.apiKey
-		)
+		// const algoliaCredemtials = context.app.get("algolia");
+		// const Algolia = new algolia(
+		// 	'products',
+		// 	algoliaCredemtials.appId,
+		// 	algoliaCredemtials.apiKey
+		// )
 
 		const objects = updatedIds.map(id => ({
-			objectID: id,
+			id,
 			label_id: label.id,
 			label_name: label.name,
 			label_position: label.position,
@@ -64,8 +64,9 @@ const fromLabel = async (label_id, context) => {
 			label_path: label.path
 		}))
 
-		Algolia.patchAll(objects)
-		
+		// Algolia.patchAll(objects
+		context.app.service('meilisearch').patch(null, objects)
+
 		return context
 	}
 
@@ -105,10 +106,10 @@ const fromLabel = async (label_id, context) => {
 			AND p.label_priority < ${label.priority}
 			${cNewProducts.length ? `AND (
 				${cNewProducts.map(it => it.new_product_days).reduce((acc, it, index) => {
-					if (index > 0) acc += 'OR '
-					acc += `p.days_of_created <= ${it}`
-					return acc
-				} , '')}
+		if (index > 0) acc += 'OR '
+		acc += `p.days_of_created <= ${it}`
+		return acc
+	}, '')}
 			)` : ''}
 	`
 
@@ -125,15 +126,15 @@ const fromLabel = async (label_id, context) => {
 			products.id IN (${productIds.join(',')})
 	`)
 
-	const algoliaCredemtials = context.app.get("algolia");
-	const Algolia = new algolia(
-		'products',
-		algoliaCredemtials.appId,
-    algoliaCredemtials.apiKey
-	)
+	// const algoliaCredemtials = context.app.get("algolia");
+	// const Algolia = new algolia(
+	// 	'products',
+	// 	algoliaCredemtials.appId,
+	// 	algoliaCredemtials.apiKey
+	// )
 
 	const objects = productIds.map(id => ({
-		objectID: id,
+		id,
 		label_id: label.id,
 		label_name: label.name,
 		label_position: label.position,
@@ -142,7 +143,8 @@ const fromLabel = async (label_id, context) => {
 		label_path: label.path
 	}))
 
-	Algolia.patchAll(objects)
+	// Algolia.patchAll(objects)
+	context.app.service('meilisearch').patch(null, objects)
 
 	return context
 }
@@ -273,6 +275,6 @@ const fromProduct = async (product_id, context) => {
 module.exports = (label_id, product_id) => async (context) => {
 	if (label_id) return fromLabel(label_id, context)
 	else if (product_id) return fromProduct(product_id, context)
-		
+
 	return context
 }

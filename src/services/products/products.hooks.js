@@ -1,5 +1,5 @@
 const assingPathCategory = require('./hooks/assing-path-category');
-const pushAlgolia = require('./hooks/push-algolia');
+// const pushAlgolia = require('./hooks/push-algolia');
 const prepareRecordsForAlgolia = require('./hooks/prepare-records-for-algolia');
 const updateAlgolia = require('./hooks/update-algolia');
 const registerProduct = require('./hooks/register-product');
@@ -18,12 +18,12 @@ const assingTaxtIntegration = require('./hooks/asing-tax-integration');
 const assingSlug = require('./hooks/asing-slug');
 const assingSlugPatch = require('./hooks/asing-slug-patch');
 const topSelledProducts = require('./hooks/top-selled-products');
-const assingTaxtInternal = require('./hooks/asing-tax-internal');
+// const assingTaxtInternal = require('./hooks/asing-tax-internal');
 const assingTaxAdmin = require('./hooks/asing-tax-admin');
 const responseIntegration = require('./hooks/response-integration');
 const switchImages = require('./hooks/switch-images');
 const sanitationProductName = require('./hooks/sanitation-product-name');
-const removeSoftDelete = require('../../hooks/remove-softdelete');
+// const removeSoftDelete = require('../../hooks/remove-softdelete');
 const updateIntegrationHash = require('./hooks/updateIntegrationHash');
 const assignLabelToProducts = require('../../hooks/assignLabelToProducts');
 
@@ -47,7 +47,7 @@ module.exports = {
       responseIntegration(),
     ],
     create: [
-      discard('label_end_date','label_id','label_path','label_position','label_start_date'),
+      discard('label_end_date', 'label_id', 'label_path', 'label_position', 'label_start_date'),
       registerProduct(),
       assingPathCategory(),
       assingTaxtIntegration(),

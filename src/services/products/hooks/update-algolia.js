@@ -92,7 +92,7 @@ module.exports = function (options = {}) {
       records.categories = categories;
 
       // records.price_with_tax += (records.price * records.tax_rule.value) / 100;
-      records.objectID = parseInt(records.id);
+      // records.objectID = parseInt(records.id);
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       records.updatedAtUnix = Math.floor(records.updatedAt / 1000);
 
@@ -101,7 +101,7 @@ module.exports = function (options = {}) {
         .split("-");
 
       // Algolia.save(records);
-      meilisearch.patch(records)
+      meilisearch.patch(null, records)
     } else if (records.status == "inactive") {
       meilisearch.remove(records.id);
     }

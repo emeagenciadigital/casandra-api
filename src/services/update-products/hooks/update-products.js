@@ -18,7 +18,7 @@ module.exports = (options = {}) => {
 
     for (const key in products) {
       const product = products[key];
-      console.log(product, 'pppp');
+      // console.log(product, 'pppp');
       await context.app.service('products').patch(product.id, {});
     }
 

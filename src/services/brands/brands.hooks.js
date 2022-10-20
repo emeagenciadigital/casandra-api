@@ -1,5 +1,5 @@
 const restictRemove = require("./hooks/restrict-remove");
-const updateProductInAlgolia = require("./hooks/update-product-in-algolia");
+// const updateProductInAlgolia = require("./hooks/update-product-in-algolia");
 const removeSoftDelete = require("../../hooks/remove-softdelete");
 const searchAdmin = require("./hooks/search-admin");
 const asingSlug = require("./hooks/asing-slug");

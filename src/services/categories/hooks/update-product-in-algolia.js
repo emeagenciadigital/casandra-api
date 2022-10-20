@@ -23,7 +23,7 @@ module.exports = (options = {}) => {
       })
       .then((it) => it.data);
 
-    context.app.service('meilisearch').create(products)
+    context.app.service('meilisearch').patch(null, products)
 
     replaceItems(context, records);
 

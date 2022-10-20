@@ -6,7 +6,7 @@ const {
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
-const algolia = require("../../../utils/algolia");
+// const algolia = require("../../../utils/algolia");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
@@ -28,8 +28,6 @@ module.exports = function (options = {}) {
     // Get the record(s) from context.data (before), context.result.data or context.result (after).
     // getItems always returns an array to simplify your processing.
     let records = getItems(context);
-
-    const knex = context.app.get("knex");
 
     if (context.params.integration == "true") {
       const products = await context.app

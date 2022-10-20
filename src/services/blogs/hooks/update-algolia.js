@@ -6,7 +6,7 @@ const {
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
-const algolia = require("../../../utils/algolia");
+// const algolia = require("../../../utils/algolia");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
@@ -29,21 +29,25 @@ module.exports = function (options = {}) {
     // getItems always returns an array to simplify your processing.
     const records = getItems(context);
 
-    const algoliaCredemtials = context.app.get("algolia");
+    // const algoliaCredemtials = context.app.get("algolia");
 
-    const Algolia = new algolia(
-      "blogsAndGuides",
-      algoliaCredemtials.appId,
-      algoliaCredemtials.apiKey
-    );
+    // const Algolia = new algolia(
+    //   "blogsAndGuides",
+    //   algoliaCredemtials.appId,
+    //   algoliaCredemtials.apiKey
+    // );
+
+    const meilisearch = context.app.service('meilisearch')
 
     if (records.status == "active") {
-      records.objectID = parseInt(records.id);
+      // records.objectID = parseInt(records.id);
       records.description ? delete records.description : null;
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
-      Algolia.save(records);
+      // Algolia.save(records);
+      meilisearch.patch(null, records)
     } else if (records.status == "inactive") {
-      Algolia.remove(records.id);
+      // Algolia.remove(records.id);
+      meilisearch.remove(records.id)
     }
 
     // Place the modified records back in the context.

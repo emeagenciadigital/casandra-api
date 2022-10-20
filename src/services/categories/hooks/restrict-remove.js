@@ -1,12 +1,12 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 const {
-  checkContext,
+  // checkContext,
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
 const { NotAcceptable } = require("@feathersjs/errors");
-const batchUpdateExpressProductsAlgolia = require("../../../hooks/batch-update-express-products-algolia");
+// const batchUpdateExpressProductsAlgolia = require("../../../hooks/batch-update-express-products-algolia");
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
   return async (context) => {

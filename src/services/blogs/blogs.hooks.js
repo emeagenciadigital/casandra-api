@@ -1,6 +1,6 @@
 const registerBlogGuide = require("./hooks/register-blog-guide");
-const removeAlgolia = require("./hooks/remove-algolia");
-const updateAlgolia = require("./hooks/update-algolia");
+// const removeAlgolia = require("./hooks/remove-algolia");
+// const updateAlgolia = require("./hooks/update-algolia");
 const restricActiveBeforePatch = require("./hooks/restric-active-before-patch");
 const removeSoftDelete = require("../../hooks/remove-softdelete");
 const searchAdmin = require("./hooks/search-admin");
