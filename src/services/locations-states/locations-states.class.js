@@ -1,12 +1,8 @@
-const { Service } = require('feathers-objection');
+const { Service } = require('feathers-sequelize');
 
 exports.LocationsStates = class LocationsStates extends Service {
-  constructor(options) {
-    const { Model, ...otherOptions } = options;
-
-    super({
-      ...otherOptions,
-      model: Model
-    });
+  // eslint-disable-next-line no-unused-vars
+  constructor(options, app) {
+    super(options)
   }
 };

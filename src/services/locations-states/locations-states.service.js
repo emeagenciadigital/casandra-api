@@ -1,6 +1,6 @@
 // Initializes the `locations-states` service on path `/locations-states`
 const { LocationsStates } = require("./locations-states.class");
-const createModel = require("../../models/locations-states.model");
+const createModel = require("../../models/locations-states.sequelize.model");
 const hooks = require("./locations-states.hooks");
 
 module.exports = function (app) {

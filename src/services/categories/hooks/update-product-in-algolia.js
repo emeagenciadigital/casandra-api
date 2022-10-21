@@ -21,7 +21,12 @@ module.exports = (options = {}) => {
           status: "active",
         },
       })
-      .then((it) => it.data);
+      .then((it) => it.data.map(it => ({
+        ...it,
+        id: `product-${it.id}`,
+        type: 'product',
+        real_id: it.id
+      })));
 
     context.app.service('meilisearch').patch(null, products)
 

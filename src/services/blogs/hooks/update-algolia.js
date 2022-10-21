@@ -41,13 +41,14 @@ module.exports = function (options = {}) {
 
     if (records.status == "active") {
       // records.objectID = parseInt(records.id);
+      records.id = `blog-${records.id}`
       records.description ? delete records.description : null;
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       // Algolia.save(records);
       meilisearch.patch(null, records)
     } else if (records.status == "inactive") {
       // Algolia.remove(records.id);
-      meilisearch.remove(records.id)
+      meilisearch.remove(`blog-${records.id}`)
     }
 
     // Place the modified records back in the context.

@@ -1,3 +1,6 @@
+const syncMeilisearchHook = require("./hooks/sync-meilisearch.hook");
+const { joinWithAllData } = require('./contacts-directory.joins')
+
 module.exports = {
   before: {
     all: [],
@@ -6,17 +9,17 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [],
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [joinWithAllData(), syncMeilisearchHook()],
     update: [],
-    patch: [],
-    remove: []
+    patch: [joinWithAllData(), syncMeilisearchHook()],
+    remove: [],
   },
 
   error: {
@@ -26,6 +29,6 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
-  }
+    remove: [],
+  },
 };

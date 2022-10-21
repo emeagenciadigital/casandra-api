@@ -11,7 +11,7 @@ module.exports = (options = {}, index) => {
   return async context => {
     let records = getItems(context);
 
-    const data = options.map(it => ({ ...it, id: it.id }));
+    const data = options.map(it => ({ ...it, id: `product-${it.id}`, type: 'product', real_id: it.id }));
 
     // const algoliaCredemtials = context.app.get("algolia");
 
