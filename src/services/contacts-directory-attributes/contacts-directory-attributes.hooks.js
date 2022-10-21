@@ -1,3 +1,6 @@
+const syncMeilisearchHook = require("./hooks/sync-meilisearch.hook");
+
+
 module.exports = {
   before: {
     all: [],
@@ -6,17 +9,17 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [],
   },
 
   after: {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [syncMeilisearchHook()],
     update: [],
-    patch: [],
-    remove: []
+    patch: [syncMeilisearchHook()],
+    remove: [syncMeilisearchHook()],
   },
 
   error: {
@@ -26,6 +29,6 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
-  }
+    remove: [],
+  },
 };

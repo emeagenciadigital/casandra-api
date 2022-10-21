@@ -93,6 +93,7 @@ module.exports = function (options = {}) {
 
       // records.price_with_tax += (records.price * records.tax_rule.value) / 100;
       // records.objectID = parseInt(records.id);
+      records.id = `product-${records.id}`
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       records.updatedAtUnix = Math.floor(records.updatedAt / 1000);
 
@@ -103,7 +104,7 @@ module.exports = function (options = {}) {
       // Algolia.save(records);
       meilisearch.patch(null, records)
     } else if (records.status == "inactive") {
-      meilisearch.remove(records.id);
+      meilisearch.remove(`product-${records.id}`);
     }
 
     // Place the modified records back in the context.

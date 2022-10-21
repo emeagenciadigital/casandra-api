@@ -60,12 +60,13 @@ const paymentConfirmations = require('./payment-confirmations/payment-confirmati
 const wompiTokenizeCreditCard = require('./wompi-tokenize-credit-card/wompi-tokenize-credit-card.service.js');
 const meilisearch = require('./meilisearch/meilisearch.service')
 const createProcessPayment = require('./create-process-payment/create-process-payment.service.js');
-
 const wompiGenerateMerchant = require('./wompi-generate-merchant/wompi-generate-merchant.service.js');
-
 const wompiPseBanks = require('./wompi-pse-banks/wompi-pse-banks.service.js');
-
 const wompiWebhookEvents = require('./wompi-webhook-events/wompi-webhook-events.service.js');
+const contactsDirectory = require('./contacts-directory/contacts-directory.service')
+const contactsDirectoryAttributes = require('./contacts-directory-attributes/contacts-directory-attributes.service')
+const contactsDirectoryCategories = require('./contacts-directory-categories/contacts-directory-categories.service')
+const contactsDirectoryMedia = require('./contacts-directory-media/contacts-directory-media.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -133,4 +134,8 @@ module.exports = function (app) {
   app.configure(wompiPseBanks);
   app.configure(wompiWebhookEvents);
   app.configure(meilisearch);
+  app.configure(contactsDirectory);
+  app.configure(contactsDirectoryAttributes);
+  app.configure(contactsDirectoryCategories);
+  app.configure(contactsDirectoryMedia);
 };

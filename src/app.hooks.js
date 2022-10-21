@@ -1,4 +1,4 @@
-const { when } = require("feathers-hooks-common");
+const { when, iff } = require("feathers-hooks-common");
 const authorize = require("./hooks/abilities");
 const authenticate = require("./hooks/authenticate");
 const logger = require("./hooks/log");
@@ -13,12 +13,25 @@ const deleted = softDelete({
       return { [field]: null };
     }
   },
-  removeData: async (context) => {
+  removeData: async () => {
     return { deletedAt: new Date().toISOString() };
   },
 });
 
 const validEmailUserCreate = require("./hooks/valid-email-user-create");
+
+const deprecatedDelete = () => (context) =>
+  iff(context =>
+    ![
+      'contacts-directory',
+      'contacts-directory-attributes',
+      'contacts-directory-categories',
+      'contacts-directory-media',
+      'locations_cities',
+      'locations_states',
+    ].includes(context.path),
+    deleted
+  )(context)
 
 module.exports = {
   before: {
@@ -32,16 +45,16 @@ module.exports = {
       ),
       logger(),
     ],
-    find: [deleted, ],
-    get: [deleted, ],
+    find: [deprecatedDelete()],
+    get: [deprecatedDelete()],
     create: [
       (context) => {
         delete context.data.deletedAt;
       },
       validEmailUserCreate(),
     ],
-    update: [deleted],
-    patch: [deleted],
+    update: [deprecatedDelete()],
+    patch: [deprecatedDelete()],
     remove: [],
   },
 

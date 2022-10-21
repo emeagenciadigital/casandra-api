@@ -55,7 +55,9 @@ const fromLabel = async (label_id, context) => {
 		// )
 
 		const objects = updatedIds.map(id => ({
-			id,
+			id: `product-${id}`,
+			type: 'product',
+			real_id: id,
 			label_id: label.id,
 			label_name: label.name,
 			label_position: label.position,
@@ -134,7 +136,9 @@ const fromLabel = async (label_id, context) => {
 	// )
 
 	const objects = productIds.map(id => ({
-		id,
+		id: `product-${id}`,
+		type: 'product',
+		real_id: id,
 		label_id: label.id,
 		label_name: label.name,
 		label_position: label.position,

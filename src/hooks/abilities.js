@@ -56,7 +56,8 @@ function defineAbilitiesFor(user, context) {
     'catalogs',
     'stores',
     'products-characteristics',
-    'discounts'
+    'discounts',
+    'contacts-directory'
   ]);
 
   can('update', [
@@ -84,7 +85,7 @@ function defineAbilitiesFor(user, context) {
         'favorites',
         'custom-payments',
         'reviews',
-        
+
         'create-process-payment',
         'wompi-tokenize-credit-card',
         'wompi-generate-merchant',

@@ -1,5 +1,3 @@
-const removeSoftDelete = require("../../hooks/remove-softdelete");
-
 const { fastJoin } = require("feathers-hooks-common");
 
 const resolves = {
@@ -9,9 +7,7 @@ const resolves = {
         context.app
           .service("locations-states")
           .getModel()
-          .query()
-          .where({ id: records.state_id, deletedAt: null })
-          .then((it) => it[0]),
+          .findByPk(records.state_id),
       ]);
     },
   },
@@ -25,7 +21,7 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: [removeSoftDelete()],
+    remove: [],
   },
 
   after: {

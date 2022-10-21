@@ -41,7 +41,7 @@ module.exports = (options = {}) => {
     // );
 
     // Algolia.remove(record.id);
-    context.app.service('meilisearch').remove(record.id)
+    context.app.service('meilisearch').remove(`product-${record.id}`)
 
     context.result = record;
     return context;
