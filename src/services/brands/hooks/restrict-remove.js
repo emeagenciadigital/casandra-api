@@ -12,14 +12,14 @@ module.exports = (options = {}) => {
     let records = getItems(context);
 
     const products = await context.app
-      .service("express-products")
+      .service("products")
       .getModel()
       .query()
       .where({ brand_id: context.id, deletedAt: null });
 
     if (products.length > 0) {
       throw new NotAcceptable(
-        "No se puede eliminar la marca por que un - unos productos la estan usando."
+        "No se puede eliminar la marca por que un - unos productos la están usando."
       );
     }
 
