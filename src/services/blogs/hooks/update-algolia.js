@@ -47,7 +47,9 @@ module.exports = function (options = {}) {
       // Algolia.save(records);
       meilisearch.patch(null, {
         ...records,
-        id: `blog-${records.id}`
+        id: `blog-${records.id}`,
+        real_id: records.id,
+        type: 'blog'
       })
     } else if (records.status == "inactive") {
       // Algolia.remove(records.id);
