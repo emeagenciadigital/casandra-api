@@ -57,7 +57,8 @@ function defineAbilitiesFor(user, context) {
     'stores',
     'products-characteristics',
     'discounts',
-    'contacts-directory'
+    'contacts-directory',
+    'work-offers',
   ]);
 
   can('update', [

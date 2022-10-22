@@ -67,6 +67,7 @@ const contactsDirectory = require('./contacts-directory/contacts-directory.servi
 const contactsDirectoryAttributes = require('./contacts-directory-attributes/contacts-directory-attributes.service')
 const contactsDirectoryCategories = require('./contacts-directory-categories/contacts-directory-categories.service')
 const contactsDirectoryMedia = require('./contacts-directory-media/contacts-directory-media.service')
+const workOffers = require('./work-offers/work-offers.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -138,4 +139,5 @@ module.exports = function (app) {
   app.configure(contactsDirectoryAttributes);
   app.configure(contactsDirectoryCategories);
   app.configure(contactsDirectoryMedia);
+  app.configure(workOffers);
 };
