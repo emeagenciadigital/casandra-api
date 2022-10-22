@@ -3,17 +3,18 @@ const { getItems } = require('feathers-hooks-common')
 module.exports = () => async (context) => {
   const record = getItems(context)
 
-  if (record.status === 'inactive') {
-    context.app.service('meilisearch').remove(record.id)
+  if (record.status === 'inactive' || context.method === 'remove') {
+    context.app.service('meilisearch').remove(`directory-${record.id}`)
     return context
   }
 
-  record.real_id = record.id
-  record.id = `directory-${record.id}`
-  record.type = 'directory'
-  record.category_name = record.category.name
-
-  context.app.service('meilisearch').patch(null, record)
+  context.app.service('meilisearch').patch(null, {
+    ...record,
+    id: `directory-${record.id}`,
+    real_id: record.id,
+    type: 'directory',
+    category_name: record.category.name,
+  })
 
   return context
 }
