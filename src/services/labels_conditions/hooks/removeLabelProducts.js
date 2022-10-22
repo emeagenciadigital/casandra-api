@@ -33,6 +33,8 @@ module.exports = (keyId) => async (context) => {
 
 	const objects = productsIds.map(it => ({
 		id: `product-${it.id}`,
+		real_id: it.id,
+		type: 'product',
 		label_id: null,
 		label_name: null,
 		label_position: null,
