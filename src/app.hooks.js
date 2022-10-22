@@ -29,6 +29,7 @@ const deprecatedDelete = () => (context) =>
       'contacts-directory-media',
       'locations_cities',
       'locations_states',
+      'work-offers',
     ].includes(context.path),
     deleted
   )(context)
