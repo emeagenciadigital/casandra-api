@@ -50,7 +50,9 @@ module.exports = {
           "facebookId",
           "token_reset_password",
           "password",
-          "owner_company"
+          "owner_company",
+          "token_login_email",
+          "token_login_phone"
         )
       ),
       restrictUpdateRol(),

@@ -10,12 +10,14 @@ module.exports = (options = {}) => {
       (user.status === 'pending user data' &&
         user.first_name &&
         user.last_name &&
-        user.dni &&
+        // user.dni &&
+        user.phone &&
         user.email) || (
         user.status === 'pending user data' &&
         records.first_name &&
         records.last_name &&
-        records.dni &&
+        // records.dni &&
+        records.phone &&
         records.email
       )
     ) {
