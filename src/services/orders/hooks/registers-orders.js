@@ -31,15 +31,15 @@ module.exports = function () {
 
     const query = records.address_id
       ? {
-          'addresses.id': records.address_id,
-          'addresses.deletedAt': null,
-          'addresses.user_id': user.id,
-        }
+        'addresses.id': records.address_id,
+        'addresses.deletedAt': null,
+        'addresses.user_id': user.id,
+      }
       : {
-          'addresses.deletedAt': null,
-          'addresses.user_id': user.id,
-          'addresses.main': 'true',
-        };
+        'addresses.deletedAt': null,
+        'addresses.user_id': user.id,
+        'addresses.main': 'true',
+      };
 
     const address = await context.app
       .service('addresses')
@@ -133,7 +133,7 @@ module.exports = function () {
       if (!discount) throw new NotAcceptable('No se ha encontrado el descuento.')
       totalDiscount = await verifyDiscount(discount, user, shoppingCart.id, context)
     }
-  
+
 
     records.total_price = 0;
     records.total_price_shipping_cost_excl = 0;
@@ -272,10 +272,12 @@ module.exports = function () {
       fulfillment_company_meta_data = {
         price: 0,
       };
+    } else if (!records.fulfillment_company_id) {
+      throw new NotAcceptable('Se requiere el método de envío')
     }
 
-    if (!fulfillment_company_meta_data)
-      throw new NotAcceptable('No se encontro la transportadora.');
+    if (!Object.keys(fulfillment_company_meta_data).length)
+      throw new NotAcceptable('No se encontró la transportadora.');
 
     fulfillment_company_meta_data.query = {
       totalWeight,
@@ -297,6 +299,8 @@ module.exports = function () {
     delete records.address_id;
     delete records.seller;
     delete records.fulfillment_company_service_code;
+
+    console.log(records)
 
     // Place the modified records back in the context.
     replaceItems(context, records);
