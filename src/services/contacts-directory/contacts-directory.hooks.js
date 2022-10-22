@@ -19,7 +19,7 @@ module.exports = {
     create: [joinWithAllData(), syncMeilisearchHook()],
     update: [],
     patch: [joinWithAllData(), syncMeilisearchHook()],
-    remove: [],
+    remove: [syncMeilisearchHook()],
   },
 
   error: {
