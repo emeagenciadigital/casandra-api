@@ -45,15 +45,10 @@ module.exports = function (options = {}) {
       records.description ? delete records.description : null;
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       // Algolia.save(records);
-      meilisearch.patch(null, {
-        ...records,
-        id: `blog-${records.id}`,
-        real_id: records.id,
-        type: 'blog'
-      })
+      meilisearch.patch(null, { index: 'blogs', records })
     } else if (records.status == "inactive") {
       // Algolia.remove(records.id);
-      meilisearch.remove(`blog-${records.id}`)
+      meilisearch.remove(null, { query: { search: 'blogs', records: records.id } })
     }
 
     // Place the modified records back in the context.

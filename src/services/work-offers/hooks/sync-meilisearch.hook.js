@@ -4,15 +4,13 @@ module.exports = () => async (context) => {
   const record = getItems(context)
 
   if (record.status === 'inactive' || context.method === 'remove') {
-    context.app.service('meilisearch').remove(`work-offer-${record.id}`)
+    context.app.service('meilisearch').remove(null, { query: { index: 'work-offers', records: record.id } })
     return context
   }
 
   context.app.service('meilisearch').patch(null, {
-    ...record,
-    id: `work-offer-${record.id}`,
-    real_id: record.id,
-    type: 'work-offer',
+    index: 'work-offers',
+    records: record
   })
 
   return context

@@ -21,7 +21,7 @@ module.exports = (options = {}, index) => {
 
     // Algolia.remove(context.id);
 
-    context.app.service('meilisearch').remove(`product-${context.id}`)
+    context.app.service('meilisearch').remove(null, { query: { index: 'search', records: context.id } })
 
     replaceItems(context, records);
 

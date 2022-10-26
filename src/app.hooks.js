@@ -30,6 +30,12 @@ const deprecatedDelete = () => (context) =>
       'locations-cities',
       'locations-states',
       'work-offers',
+      'courses',
+      'courses-categories',
+      'course-benefits',
+      'course-rating',
+      'course-chapters',
+      'course-sections',
     ].includes(context.path),
     deleted
   )(context)

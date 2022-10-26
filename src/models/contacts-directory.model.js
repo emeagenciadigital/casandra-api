@@ -43,7 +43,7 @@ module.exports = (app) => {
       status: {
         type: DataTypes.ENUM('active', 'inactive'),
         allowNull: false,
-        defaultValue: 'active'
+        defaultValue: 'inactive'
       }
     },
     {

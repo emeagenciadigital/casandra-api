@@ -5,10 +5,15 @@ const deleteBatchDocuments = () => async (context) => {
   const app = context.app
   const config = app.get('meilisearch')
   const meilisearch = app.get('meilisearchClient')
-  const meilisearchIndex = meilisearch.index(config.index)
-  const records = context.id
+  const payload = context.params.query
+  const meilisearchIndex = meilisearch.index(payload.index || config.index)
 
-  const response = await meilisearchIndex.deleteDocuments(Array.isArray(records) ? records : [records])
+  const response = await meilisearchIndex
+    .deleteDocuments(
+      Array.isArray(payload.records)
+        ? payload.records
+        : [payload.records]
+    )
 
   replaceItems(context, response)
 

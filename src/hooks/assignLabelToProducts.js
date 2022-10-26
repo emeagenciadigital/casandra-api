@@ -55,9 +55,9 @@ const fromLabel = async (label_id, context) => {
 		// )
 
 		const objects = updatedIds.map(id => ({
-			id: `product-${id}`,
-			type: 'product',
-			real_id: id,
+			id: id,
+			// type: 'product',
+			// real_id: id,
 			label_id: label.id,
 			label_name: label.name,
 			label_position: label.position,
@@ -67,7 +67,7 @@ const fromLabel = async (label_id, context) => {
 		}))
 
 		// Algolia.patchAll(objects
-		context.app.service('meilisearch').patch(null, objects)
+		context.app.service('meilisearch').patch(null, { index: 'search', records: objects })
 
 		return context
 	}
@@ -136,9 +136,9 @@ const fromLabel = async (label_id, context) => {
 	// )
 
 	const objects = productIds.map(id => ({
-		id: `product-${id}`,
-		type: 'product',
-		real_id: id,
+		id,
+		// type: 'product',
+		// real_id: id,
 		label_id: label.id,
 		label_name: label.name,
 		label_position: label.position,
@@ -148,7 +148,7 @@ const fromLabel = async (label_id, context) => {
 	}))
 
 	// Algolia.patchAll(objects)
-	context.app.service('meilisearch').patch(null, objects)
+	context.app.service('meilisearch').patch(null, { index: 'search', records: objects })
 
 	return context
 }

@@ -103,13 +103,11 @@ module.exports = function (options = {}) {
 
       // Algolia.save(records);
       meilisearch.patch(null, {
-        ...records,
-        id: `product-${records.id}`,
-        real_id: records.id,
-        type: 'product'
+        index: 'search',
+        records,
       })
     } else if (records.status == "inactive") {
-      meilisearch.remove(`product-${records.id}`);
+      meilisearch.remove(null, { query: { index: 'search', records: records.id } });
     }
 
     // Place the modified records back in the context.
