@@ -36,6 +36,8 @@ const deprecatedDelete = () => (context) =>
       'course-rating',
       'course-chapters',
       'course-sections',
+      'wallet-movements',
+      'wallet-bonus'
     ].includes(context.path),
     deleted
   )(context)

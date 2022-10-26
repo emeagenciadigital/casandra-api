@@ -1,7 +1,9 @@
 const { AbilityBuilder, Ability } = require('@casl/ability');
-const { toMongoQuery } = require('@casl/mongoose');
+// const { toMongoQuery } = require('@casl/mongoose');
 const { Forbidden } = require('@feathersjs/errors');
 const TYPE_KEY = Symbol.for('type');
+const { rulesToQuery } = require('@casl/ability/extra')
+const { Op } = require('sequelize')
 
 Ability.addAlias('update', 'patch');
 Ability.addAlias('read', ['get', 'find']);
@@ -13,6 +15,26 @@ function subjectName(subject) {
   }
 
   return subject[TYPE_KEY];
+}
+
+function symbolize(query) {
+  return JSON.parse(JSON.stringify(query), function keyToSymbol(key, value) {
+    if (key[0] === '$') {
+      const symbol = Op[key.slice(1)]
+      this[symbol] = value
+      return
+    }
+    return value
+  })
+}
+
+function ruleToSequelize(rule) {
+  return rule.inverted ? { $not: rule.conditions } : rule.conditions
+}
+
+function toSequelizeQuery(ability, subject, action) {
+  const query = rulesToQuery(ability, action, subject, ruleToSequelize)
+  return query === null ? query : symbolize(query)
 }
 
 function defineAbilitiesFor(user, context) {
@@ -143,6 +165,11 @@ function defineAbilitiesFor(user, context) {
 
       can('update', ['users']);
 
+      if (user.role === 'user') {
+        // User wallet
+        can(['find'], ['wallet-movements'], { user_id: user.id })
+      }
+
       if (user.owner_company === 'true') {
         can('create', ['companies-files']);
 
@@ -163,6 +190,8 @@ function defineAbilitiesFor(user, context) {
 
       if (user.role === 'admin') {
         can('manage', ['all']);
+        cannot('manage', ['wallet-movements'])
+        can('manage', ['wallet-movements'], { created_by_user_id: user.id, type: 'admin' })
         cannot('remove', ['fulfillment-company']);
       } else if (user.role === 'integration') {
         can('create', [
@@ -224,7 +253,8 @@ module.exports = function authorize(name = null) {
     }
 
     if (!hook.id) {
-      const query = toMongoQuery(ability, serviceName, action);
+      // const query = toMongoQuery(ability, serviceName, action);
+      const query = toSequelizeQuery(ability, serviceName, action)
 
       if (canReadQuery(query)) {
         Object.assign(hook.params.query, query);
