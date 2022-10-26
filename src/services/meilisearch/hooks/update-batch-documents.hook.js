@@ -5,10 +5,15 @@ const updateBatchDocuments = () => async (context) => {
   const app = context.app
   const config = app.get('meilisearch')
   const meilisearch = app.get('meilisearchClient')
-  const meilisearchIndex = meilisearch.index(config.index)
-  const records = getItems(context)
+  const payload = getItems(context)
+  const meilisearchIndex = meilisearch.index(payload?.index || config.index)
 
-  const response = await meilisearchIndex.addDocuments(Array.isArray(records) ? records : [records])
+  const response = await meilisearchIndex
+    .addDocuments(
+      Array.isArray(payload.records)
+        ? payload.records
+        : [payload.records]
+    )
 
   replaceItems(context, response)
 

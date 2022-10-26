@@ -59,6 +59,9 @@ function defineAbilitiesFor(user, context) {
     'discounts',
     'contacts-directory',
     'work-offers',
+    'courses',
+    'course-rating',
+    'courses-categories'
   ]);
 
   can('update', [

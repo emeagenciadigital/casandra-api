@@ -23,12 +23,12 @@ module.exports = (options = {}) => {
       })
       .then((it) => it.data.map(it => ({
         ...it,
-        id: `product-${it.id}`,
-        type: 'product',
-        real_id: it.id
+        // id: `product-${it.id}`,
+        // type: 'product',
+        // real_id: it.id
       })));
 
-    context.app.service('meilisearch').patch(null, products)
+    context.app.service('meilisearch').patch(null, { index: 'search', records: products })
 
     replaceItems(context, records);
 

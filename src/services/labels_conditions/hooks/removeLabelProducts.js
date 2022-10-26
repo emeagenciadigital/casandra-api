@@ -32,9 +32,9 @@ module.exports = (keyId) => async (context) => {
 	// )
 
 	const objects = productsIds.map(it => ({
-		id: `product-${it.id}`,
-		real_id: it.id,
-		type: 'product',
+		id: it.id,
+		// real_id: it.id,
+		// type: 'product',
 		label_id: null,
 		label_name: null,
 		label_position: null,
@@ -44,7 +44,7 @@ module.exports = (keyId) => async (context) => {
 	}))
 
 	// Algolia.patchAll(objects)
-	context.app.service('meilisearch').patch(null, objects)
+	context.app.service('meilisearch').patch(null, { index: 'search', records: objects })
 
 	return context
 }

@@ -68,6 +68,12 @@ const contactsDirectoryAttributes = require('./contacts-directory-attributes/con
 const contactsDirectoryCategories = require('./contacts-directory-categories/contacts-directory-categories.service')
 const contactsDirectoryMedia = require('./contacts-directory-media/contacts-directory-media.service')
 const workOffers = require('./work-offers/work-offers.service')
+const courses = require('./courses/courses.service')
+const coursesCategories = require('./courses-categories/courses-categories.service')
+const courseSections = require('./course-sections/course-sections.service')
+const courseBenefits = require('./course-benefits/course-benefits.service')
+const courseChapters = require('./course-chapters/course-chapters.service')
+const courseRating = require('./course-rating/course-rating.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -140,4 +146,10 @@ module.exports = function (app) {
   app.configure(contactsDirectoryCategories);
   app.configure(contactsDirectoryMedia);
   app.configure(workOffers);
+  app.configure(courses);
+  app.configure(coursesCategories);
+  app.configure(courseSections);
+  app.configure(courseBenefits);
+  app.configure(courseChapters);
+  app.configure(courseRating);
 };
