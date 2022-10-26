@@ -74,6 +74,8 @@ const courseSections = require('./course-sections/course-sections.service')
 const courseBenefits = require('./course-benefits/course-benefits.service')
 const courseChapters = require('./course-chapters/course-chapters.service')
 const courseRating = require('./course-rating/course-rating.service')
+const walletMovements = require('./wallet-movements/wallet-movements.service')
+const walletBonus = require('./wallet-bonus/wallet-bonus.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -152,4 +154,6 @@ module.exports = function (app) {
   app.configure(courseBenefits);
   app.configure(courseChapters);
   app.configure(courseRating);
+  app.configure(walletMovements);
+  app.configure(walletBonus);
 };
