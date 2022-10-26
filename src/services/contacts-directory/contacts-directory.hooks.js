@@ -15,7 +15,7 @@ module.exports = {
   after: {
     all: [],
     find: [],
-    get: [],
+    get: [joinWithAllData()],
     create: [joinWithAllData(), syncMeilisearchHook()],
     update: [],
     patch: [joinWithAllData(), syncMeilisearchHook()],
