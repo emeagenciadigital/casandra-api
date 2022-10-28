@@ -14,21 +14,17 @@ const resolves = {
           .service("users")
           .getModel()
           .query()
-          .select('email','first_name','last_name','phone','gender','profile_picture','phone')
+          .select('email', 'first_name', 'last_name', 'phone', 'gender', 'profile_picture', 'phone')
           .where({ id: records.user_id, deletedAt: null })
           .then((it) => it[0]),
         context.app
           .service("locations-states")
           .getModel()
-          .query()
-          .where({ id: records.state_id, deletedAt: null })
-          .then((it) => it[0]),
+          .findByPk(records.state_id),
         context.app
           .service("locations-cities")
           .getModel()
-          .query()
-          .where({ id: records.city_id, deletedAt: null })
-          .then((it) => it[0]),
+          .findByPk(records.city_id)
       ]);
     },
   },
