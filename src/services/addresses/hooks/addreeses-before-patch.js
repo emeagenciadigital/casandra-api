@@ -12,26 +12,17 @@ module.exports = () => {
         .service('locations-states')
         .getModel()
         .query()
-        .where({
-          id: records.state_id,
-          deletedAt: null,
-        })
-        .then((it) => it[0]);
+        .findByPk(records.state_id)
 
-      if (!state) throw new NotFound('No se encontro el departamento enviado.');
+      if (!state) throw new NotFound('No se encontró el departamento enviado.');
 
       const city = await context.app
         .service('locations-cities')
         .getModel()
         .query()
-        .where({
-          state_id: state.id,
-          id: records.city_id,
-          deletedAt: null,
-        })
-        .then((it) => it[0]);
+        .findOne({ where: { state_id: state.id, id: records.city_id } })
 
-      if (!city) throw new NotFound('No se encontro la ciudad enviada.');
+      if (!city) throw new NotFound('No se encontró la ciudad enviada.');
 
       records.city_id = city.id;
       records.state_id = state.id;
