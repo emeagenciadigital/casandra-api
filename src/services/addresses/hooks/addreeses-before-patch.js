@@ -11,7 +11,6 @@ module.exports = () => {
       const state = await context.app
         .service('locations-states')
         .getModel()
-        .query()
         .findByPk(records.state_id)
 
       if (!state) throw new NotFound('No se encontró el departamento enviado.');
@@ -19,7 +18,6 @@ module.exports = () => {
       const city = await context.app
         .service('locations-cities')
         .getModel()
-        .query()
         .findOne({ where: { state_id: state.id, id: records.city_id } })
 
       if (!city) throw new NotFound('No se encontró la ciudad enviada.');
