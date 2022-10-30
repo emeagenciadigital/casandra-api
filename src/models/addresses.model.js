@@ -1,80 +1,74 @@
-// See https://vincit.github.io/objection.js/#models
-// for more of what you can do here.
-const { Model } = require("objection");
+const { DataTypes } = require('sequelize')
 
-class Addresses extends Model {
-  static get tableName() {
-    return "addresses";
-  }
+module.exports = (app) => {
+  const sequelizeClient = app.get('sequelizeClient')
 
-  static get jsonSchema() {
-    return {
-      type: "object",
-      required: ["main"],
-
-      properties: {
-        name: { type: "string", maxLength: 255 },
-        address: { type: "string", maxLength: 255 },
-        company_id: { type: "integer" },
-        city_id: { type: "integer" },
-        state_id: { type: "integer" },
-        details: { type: "string" },
-        main: { type: "string", enum: ["true", "false"] },
-        deletedAt: { type: "string", format: "date-time" },
+  const addresses = sequelizeClient.define(
+    'addresses',
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
-    };
-  }
-
-  $beforeInsert() {
-    this.createdAt = this.updatedAt = new Date().toISOString();
-  }
-
-  $beforeUpdate() {
-    this.updatedAt = new Date().toISOString();
-  }
-}
-
-module.exports = function (app) {
-  if (app) {
-    const db = app.get("knex");
-
-    db.schema
-      .hasTable("addresses")
-      .then((exists) => {
-        if (!exists) {
-          db.schema
-            .createTable("addresses", (table) => {
-              table.increments("id");
-              table.string("name", 255);
-              table.string("address", 255);
-              table
-                .integer("city_id")
-                .unsigned()
-                .references("id")
-                .inTable("locations_cities")
-                .index();
-              table
-                .integer("state_id")
-                .unsigned()
-                .references("id")
-                .inTable("locations_states")
-                .index();
-              table.double("lat");
-              table.double("lng");
-              table.string("details");
-              table.enum("main", ["true", "false"]);
-              table.string("integration_nit");
-              table.integer("integration_codigo_direccion");
-              table.timestamp("deletedAt").nullable();
-              table.timestamp("createdAt");
-              table.timestamp("updatedAt");
-            })
-            .then(() => {}) // eslint-disable-line no-console
-            .catch((e) => {}); // eslint-disable-line no-console
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      city_id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+      },
+      state_id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+      },
+      lat: {
+        type: DataTypes.FLOAT,
+      },
+      lng: {
+        type: DataTypes.FLOAT,
+      },
+      details: {
+        type: DataTypes.STRING,
+      },
+      main: {
+        type: DataTypes.ENUM('true', 'false'),
+        allowNull: false,
+      },
+      postal_code: {
+        type: DataTypes.STRING,
+      }
+    },
+    {
+      paranoid: true,
+      hooks: {
+        beforeCount(options) {
+          options.raw = true
         }
-      })
-      .catch((e) => console.error("Error creating addresses table", e)); // eslint-disable-line no-console
+      }
+    }
+  )
+
+  addresses.associate = function (models) {
+    addresses.belongsTo(models.locations_states, {
+      foreignKey: 'state_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
+      as: 'state'
+    })
+    addresses.belongsTo(models.locations_cities, {
+      foreignKey: 'city_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
+      as: 'city'
+    })
   }
 
-  return Addresses;
-};
+  // addresses.sync({ alter: true }).catch(err => console.log(err))
+
+  return addresses
+}

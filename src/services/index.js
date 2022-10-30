@@ -37,7 +37,6 @@ const enviaColvanes = require('./envia-colvanes/envia-colvanes.service.js');
 const contact = require('./contact/contact.service.js');
 const documentosPed = require('./documentos-ped/documentos-ped.service.js');
 const documentosPedHistoria = require('./documentos-ped-historia/documentos-ped-historia.service.js');
-const userProductsViews = require('./user-products-views/user-products-views.service.js');
 const design = require('./design/design.service.js');
 const updateProducts = require('./update-products/update-products.service.js');
 const tercerosDms = require('./terceros-dms/terceros-dms.service.js');
@@ -76,6 +75,9 @@ const courseChapters = require('./course-chapters/course-chapters.service')
 const courseRating = require('./course-rating/course-rating.service')
 const walletMovements = require('./wallet-movements/wallet-movements.service')
 const walletBonus = require('./wallet-bonus/wallet-bonus.service')
+const workOffersCategories = require('./work-offers-categories/work-offers-categories.service')
+const userProductViews = require('./user-product-views/user-product-views.service')
+const rawQueries = require('./raw-queries/raw-queries.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -117,7 +119,6 @@ module.exports = function (app) {
   app.configure(contact);
   app.configure(documentosPed);
   app.configure(documentosPedHistoria);
-  app.configure(userProductsViews);
   app.configure(design);
   app.configure(updateProducts);
   app.configure(tercerosDms);
@@ -156,4 +157,7 @@ module.exports = function (app) {
   app.configure(courseRating);
   app.configure(walletMovements);
   app.configure(walletBonus);
+  app.configure(workOffersCategories);
+  app.configure(userProductViews);
+  app.configure(rawQueries);
 };

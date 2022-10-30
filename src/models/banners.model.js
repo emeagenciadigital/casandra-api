@@ -18,7 +18,7 @@ class banners extends Model {
         priority: { type: "integer" },
         type: {
           type: "string",
-          enum: ["HOME", "OFFERS", "POPUP"],
+          enum: ["HOME", "OFFERS", "POPUP", "ACADEMY"],
         },
         status: {
           type: "string",
@@ -51,15 +51,15 @@ module.exports = function (app) {
             table.text("path_movile");
             table.text("path_desktop");
             table.integer("priority").defaultTo(1);
-            table.enum('type', ["HOME", "OFFERS", "POPUP"]);
+            table.enum('type', ["HOME", "OFFERS", "POPUP", "ACADEMY"]);
             table.enum('status', ["active", "inactive"]).defaultTo('active');
             table.text("url");
             table.timestamp("deletedAt").nullable();
             table.timestamp("createdAt");
             table.timestamp("updatedAt");
           })
-          .then(() => {}) // eslint-disable-line no-console
-          .catch(() => {}); // eslint-disable-line no-console
+          .then(() => { }) // eslint-disable-line no-console
+          .catch(() => { }); // eslint-disable-line no-console
       }
     })
     .catch((e) => console.error("Error creating banners table", e)); // eslint-disable-line no-console

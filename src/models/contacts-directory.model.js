@@ -40,6 +40,14 @@ module.exports = (app) => {
       path_cover: {
         type: DataTypes.STRING,
       },
+      years_of_experience: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      job_availability: {
+        type: DataTypes.ENUM('tiempo_completo', 'medio_tiempo', 'trabajo_independiente'),
+        allowNull: false,
+      },
       status: {
         type: DataTypes.ENUM('active', 'inactive'),
         allowNull: false,

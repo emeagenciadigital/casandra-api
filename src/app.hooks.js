@@ -19,26 +19,11 @@ const deleted = softDelete({
 });
 
 const validEmailUserCreate = require("./hooks/valid-email-user-create");
+const { SEQUELIZE_MODELS } = require("./constants");
 
 const deprecatedDelete = () => (context) =>
   iff(context =>
-    ![
-      'contacts-directory',
-      'contacts-directory-attributes',
-      'contacts-directory-categories',
-      'contacts-directory-media',
-      'locations-cities',
-      'locations-states',
-      'work-offers',
-      'courses',
-      'courses-categories',
-      'course-benefits',
-      'course-rating',
-      'course-chapters',
-      'course-sections',
-      'wallet-movements',
-      'wallet-bonus'
-    ].includes(context.path),
+    !SEQUELIZE_MODELS.includes(context.path),
     deleted
   )(context)
 
