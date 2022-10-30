@@ -8,7 +8,6 @@ module.exports = (app) => {
     {
       name: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       address: {
         type: DataTypes.STRING,
@@ -22,9 +21,15 @@ module.exports = (app) => {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
       },
+      city_name: {
+        type: DataTypes.STRING,
+      },
       state_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
+      },
+      state_name: {
+        type: DataTypes.STRING,
       },
       lat: {
         type: DataTypes.FLOAT,
@@ -38,6 +43,7 @@ module.exports = (app) => {
       main: {
         type: DataTypes.ENUM('true', 'false'),
         allowNull: false,
+        defaultValue: 'true',
       },
       postal_code: {
         type: DataTypes.STRING,

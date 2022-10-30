@@ -46,14 +46,15 @@ const switchRegisterShoppingCartAfter = [
 const productsJoins = {
   joins: {
     role: () => async (records, context) => {
-      const { user } = context.params;
 
       const address = await context.app
         .service('addresses')
         .getModel()
-        .query()
-        .where({ user_id: records.user_id, main: 'true' })
-        .then((it) => it[0]);
+        .findOne({
+          where: {
+            user_id: records.user_id, main: 'true'
+          }
+        })
       if (address) {
         // records.shipping_cost = await context.app
         //   .service("search-shipping-cost")
@@ -109,7 +110,7 @@ const productsJoins = {
                 .orderBy('priority', 'desc')
                 .then((it) => it[0]);
           } else if (product && product.deletedAt !== null) {
-            records.shopping_cart_details[index].product =  {
+            records.shopping_cart_details[index].product = {
               id: product.id,
               name: product.name,
               status: 'deleted',
