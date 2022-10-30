@@ -192,7 +192,8 @@ function defineAbilitiesFor(user, context) {
       if (user.role === 'admin') {
         can('manage', ['all']);
         cannot('manage', ['wallet-movements'])
-        can('manage', ['wallet-movements'], { created_by_user_id: user.id, type: 'admin' })
+        can('read', ['wallet-movements'], { created_by_user_id: user.id, type: 'admin' })
+        can('create', ['wallet-movements'], { type: 'admin' })
         cannot('remove', ['fulfillment-company']);
       } else if (user.role === 'integration') {
         can('create', [
