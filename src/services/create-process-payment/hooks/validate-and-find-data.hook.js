@@ -1,7 +1,7 @@
 const { NotAcceptable } = require('@feathersjs/errors')
 const { getItems, replaceItems } = require('feathers-hooks-common')
 
-const AVAILABLE_PAYMENT_METHODS = ['credit_card', 'pse']
+const AVAILABLE_PAYMENT_METHODS = ['credit_card', 'pse', 'bancolombia', 'nequi']
 const AVAILABLE_GATEWAYS = ['wompi']
 
 const STATUS_PENDING_PAYMENT = 1
@@ -10,12 +10,12 @@ const ID_URL_CONFIRMATION = 1
 module.exports = () => async context => {
     const record = getItems(context)
     const user = context.params.user
- 
+
     if (!AVAILABLE_PAYMENT_METHODS.includes(record.payment_method))
         throw new NotAcceptable('Payment method is no allowed!')
 
     if (!AVAILABLE_GATEWAYS.includes(record.gateway))
-        throw new NotAcceptable('Gateway is not allowed!')      
+        throw new NotAcceptable('Gateway is not allowed!')
 
     const [order, creditCard, urlConfirmation] = await Promise.all([
         context.app.service('orders')
@@ -50,14 +50,14 @@ module.exports = () => async context => {
                 deletedAt: null
             })
             .then(it => it[0]) : undefined,
-            context.app
-              .service('configurations')
-              .getModel()
-              .query()
-              .where({
-                  id: ID_URL_CONFIRMATION
-              })
-              .then((it) => it[0]),
+        context.app
+            .service('configurations')
+            .getModel()
+            .query()
+            .where({
+                id: ID_URL_CONFIRMATION
+            })
+            .then((it) => it[0]),
     ])
 
     if (!order) throw new NotAcceptable('The order not exists.')
@@ -69,7 +69,7 @@ module.exports = () => async context => {
     if (record.payment_method === 'credit_card') {
         if (record.gateway !== creditCard.gateway) throw new NotAcceptable('Invalid credit card!')
     }
-    
+
     record.order = order
     record.creditCard = creditCard
     record.urlConfirmation = `${urlConfirmation.value}/${order.id}`

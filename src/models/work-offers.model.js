@@ -13,8 +13,8 @@ module.exports = (app) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      category: {
-        type: DataTypes.STRING,
+      category_id: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       city_id: {
@@ -34,7 +34,7 @@ module.exports = (app) => {
         allowNull: false,
       },
       job_type: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('tiempo_completo', 'medio_tiempo'),
         allowNull: false,
       },
       description: {
@@ -63,6 +63,15 @@ module.exports = (app) => {
       }
     }
   )
+
+  workOffers.associate = function (models) {
+    workOffers.belongsTo(models.work_offers_categories, {
+      foreignKey: 'category_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
+      as: 'category',
+    })
+  }
 
   // workOffers.sync({ alter: true }).catch(err => console.log(err))
 

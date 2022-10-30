@@ -4,7 +4,7 @@ const axios = require('axios')
 module.exports = class Wompi {
     constructor(app) {
         const config = app.get('wompi')
-        
+
         this.urlBase = config.url_base
         this.pubKey = config.public_key
         this.privKey = config.private_key
@@ -18,10 +18,10 @@ module.exports = class Wompi {
         const response = await this.fetch.post('/tokens/cards', payload, {
             headers: this._getHeaders({ token: this.pubKey })
         })
-        .then(res => res.data)
-        .catch(err => {
-            throw new GeneralError(err.response.data)
-        })
+            .then(res => res.data)
+            .catch(err => {
+                throw new GeneralError(err.response.data)
+            })
         return response
     }
 
@@ -29,10 +29,10 @@ module.exports = class Wompi {
         const response = await this.fetch.post('/transactions', payload, {
             headers: this._getHeaders({ token: this.pubKey })
         })
-        .then(res => res.data)
-        .catch(err => {
-            throw new NotAcceptable(err.response.data)
-        })
+            .then(res => res.data)
+            .catch(err => {
+                throw new NotAcceptable(err.response.data)
+            })
         return response
     }
 
@@ -48,22 +48,22 @@ module.exports = class Wompi {
         return await this.fetch.get(`/transactions/${id}`, {
             headers: this._getHeaders({ token: this.privKey })
         })
-        .then(res => res.data)
-        .then(res => res.data)
-        .catch(err => {
-            throw new NotAcceptable(err.response.data)
-        })
+            .then(res => res.data)
+            .then(res => res.data)
+            .catch(err => {
+                throw new NotAcceptable(err.response.data)
+            })
     }
 
     async getPseBanks() {
         return await this.fetch.get(`/pse/financial_institutions`, {
             headers: this._getHeaders({ token: this.privKey })
         })
-        .then(res => res.data)
-        .then(res => res.data)
-        .catch(err => {
-            throw new NotAcceptable(err.response.data)
-        })
+            .then(res => res.data)
+            .then(res => res.data)
+            .catch(err => {
+                throw new NotAcceptable(err.response.data)
+            })
     }
 
     _configureAxios() {

@@ -1,7 +1,6 @@
 const addressesBC = require("./hooks/addresses-b-c");
 const addressesAC = require("./hooks/addreeses-a-c");
 const addressesAP = require("./hooks/addresses-a-p");
-const removeSoftDelete = require("../../hooks/remove-softdelete");
 const searchAdmin = require("./hooks/search-admin");
 const addreesesBeforePatch = require("./hooks/addreeses-before-patch.js");
 const { fastJoin } = require("feathers-hooks-common");
@@ -38,7 +37,7 @@ module.exports = {
     create: [addressesBC()],
     update: [],
     patch: [addreesesBeforePatch()],
-    remove: [removeSoftDelete()],
+    remove: [],
   },
 
   after: {

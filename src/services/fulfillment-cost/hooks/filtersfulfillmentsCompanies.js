@@ -24,24 +24,15 @@ module.exports = (options = {}) => {
       context.app
         .service('addresses')
         .getModel()
-        .query()
-        .select(
-          'addresses.*',
-          'locations_cities.dane_code AS dane_code',
-          'locations_cities.name AS city_name'
-        )
-        .innerJoin(
-          'locations_cities',
-          'locations_cities.id',
-          '=',
-          'addresses.city_id'
-        )
-        .where({
-          'addresses.id': address_id,
-          'addresses.user_id': user.id,
-          'addresses.deletedAt': null,
-        })
-        .then((it) => it[0]),
+        .findOne({
+          include: [
+            { association: 'city', attributes: ['id', 'dane_code'] },
+          ],
+          where: {
+            id: address_id,
+            user_id: user.id,
+          }
+        }),
       context.app
         .service('shopping-cart')
         .getModel()
@@ -140,7 +131,7 @@ module.exports = (options = {}) => {
           .where({
             fulfillment_company_id: company.fulfillment_company_id,
             type: 'weight',
-            dane_code: address.dane_code,
+            dane_code: address.city.dane_code,
           })
           .where('min', '<=', totalWeight)
           .where('max', '>=', totalWeight)
@@ -169,7 +160,7 @@ module.exports = (options = {}) => {
             quote.push(
               await context.app.service('envia-colvanes').create({
                 action: 'find',
-                destination_city: `${address.dane_code}`,
+                destination_city: `${address.city.dane_code}`,
                 city_origin: '08001',
                 weight: totalWeight,
                 volume,
@@ -183,7 +174,7 @@ module.exports = (options = {}) => {
 
           if (quote.status == 'success') {
             quote.city_name = address.city_name;
-            quote.destination_city_dane = address.dane_code;
+            quote.destination_city_dane = address.city.dane_code;
             quote.price = quote.valor_costom + quote.valor_flete;
             quote.fulfillmentCompany = company;
           }
@@ -192,7 +183,7 @@ module.exports = (options = {}) => {
             ...quote.map((it) => ({
               ...it,
               city_name: address.city_name,
-              destination_city_dane: address.dane_code,
+              destination_city_dane: address.city.dane_code,
               price: it.valor_costom + it.valor_flete,
               fulfillmentCompany: company,
             }))

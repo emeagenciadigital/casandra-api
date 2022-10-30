@@ -1,9 +1,10 @@
 const { AbilityBuilder, Ability } = require('@casl/ability');
-// const { toMongoQuery } = require('@casl/mongoose');
+const { toMongoQuery } = require('@casl/mongoose');
 const { Forbidden } = require('@feathersjs/errors');
 const TYPE_KEY = Symbol.for('type');
 const { rulesToQuery } = require('@casl/ability/extra')
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
+const { SEQUELIZE_MODELS } = require('../constants');
 
 Ability.addAlias('update', 'patch');
 Ability.addAlias('read', ['get', 'find']);
@@ -56,7 +57,7 @@ function defineAbilitiesFor(user, context) {
     'shopping-cart',
     'shopping-cart-details',
     'contact',
-    'user-products-views',
+    'user-product-views',
     'payment-confirmation-paymentez',
     'wompi-webhook-events',
   ]);
@@ -81,10 +82,13 @@ function defineAbilitiesFor(user, context) {
     'discounts',
     'contacts-directory',
     'work-offers',
+    'work-offers-categories',
     'courses',
     'course-rating',
     'courses-categories',
     'contacts-directory-categories',
+    'contacts-directory-media',
+    'contacts-directory-attributes',
   ]);
 
   can('update', [
@@ -101,7 +105,6 @@ function defineAbilitiesFor(user, context) {
         'purchase-orders',
         'user-device-tokens',
         'addresses',
-        'credit-cards',
         'authors',
         'shopping-cart',
         'shopping-cart-details',
@@ -112,7 +115,6 @@ function defineAbilitiesFor(user, context) {
         'favorites',
         'custom-payments',
         'reviews',
-
         'create-process-payment',
         'wompi-tokenize-credit-card',
         'wompi-generate-merchant',
@@ -137,7 +139,7 @@ function defineAbilitiesFor(user, context) {
 
       can(
         'manage',
-        ['addresses', 'credit-cards', 'favorites', 'companies-files'],
+        ['addresses', 'favorites', 'credit-cards', 'companies-files'],
         {
           user_id: user.id,
         }
@@ -162,6 +164,7 @@ function defineAbilitiesFor(user, context) {
         'shipping',
         'shipping-details',
         'catalogs',
+        'raw-queries/user-purchase-products'
       ]);
 
       can('update', ['users']);
@@ -256,7 +259,9 @@ module.exports = function authorize(name = null) {
 
     if (!hook.id) {
       // const query = toMongoQuery(ability, serviceName, action);
-      const query = toSequelizeQuery(ability, serviceName, action)
+      const query = (SEQUELIZE_MODELS.includes(serviceName)
+        ? toSequelizeQuery
+        : toMongoQuery)(ability, serviceName, action)
 
       if (canReadQuery(query)) {
         Object.assign(hook.params.query, query);

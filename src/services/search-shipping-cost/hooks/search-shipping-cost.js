@@ -8,8 +8,6 @@ module.exports = (options = {}) => {
   return async (context) => {
     let records = getItems(context);
 
-    const { user } = context.params;
-
     if (context.colvanes == 'true') return context;
     let coordinate = null;
     let query = null;
@@ -18,9 +16,7 @@ module.exports = (options = {}) => {
       const address = await context.app
         .service('addresses')
         .getModel()
-        .query()
-        .where({ id: context.params.query.address_id })
-        .then((it) => it[0]);
+        .findByPk(context.params.query.address_id)
 
       if (!address) throw new NotFound('No se encontró la dirección.');
 
