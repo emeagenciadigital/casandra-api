@@ -23,7 +23,7 @@ module.exports = (app) => {
         allowNull: false,
       },
       score: {
-        type: DataTypes.FLOAT(1, 1),
+        type: DataTypes.FLOAT(5, 1),
       },
       short_description: {
         type: DataTypes.TEXT('medium'),
