@@ -29,48 +29,20 @@ module.exports = function () {
     if (!shoppingCart)
       throw new NotFound('No se encontró el carro de compras.');
 
-    const query = records.address_id
-      ? {
-        'addresses.id': records.address_id,
-        'addresses.deletedAt': null,
-        'addresses.user_id': user.id,
-      }
-      : {
-        'addresses.deletedAt': null,
-        'addresses.user_id': user.id,
-        'addresses.main': 'true',
-      };
+    const where = records.address_id
+      ? { id: records.address_id, user_id: user.id }
+      : { user_id: user.id, main: 'true' }
 
     const address = await context.app
       .service('addresses')
       .getModel()
-      .query()
-      .select(
-        'addresses.*',
-        'addresses.name AS address_name',
-        'addresses.id AS address_id',
-        'addresses.integration_nit',
-        'addresses.integration_codigo_direccion',
-        'locations_states.name AS state_name',
-        'locations_states.integration_id AS state_integration_id',
-        'locations_cities.name AS city_name',
-        'locations_cities.integration_id AS city_integration_id',
-        'locations_cities.dane_code AS dane_code'
-      )
-      .innerJoin(
-        'locations_states',
-        'addresses.state_id',
-        '=',
-        'locations_states.id'
-      )
-      .innerJoin(
-        'locations_cities',
-        'addresses.city_id',
-        '=',
-        'locations_cities.id'
-      )
-      .where(query)
-      .then((it) => it[0]);
+      .findOne({
+        include: [
+          { association: 'city', },
+          { association: 'state' },
+        ],
+        where
+      })
 
     if (!address) throw new NotFound('No se encontró la dirección.');
 
@@ -201,7 +173,7 @@ module.exports = function () {
     };
 
     records.shipping_address_meta_data = JSON.stringify({
-      ...address,
+      ...JSON.parse(JSON.stringify(address)),
       seller: records.seller,
       fulfillment_company_id: records.fulfillment_company_id,
     });
@@ -239,7 +211,7 @@ module.exports = function () {
         )
         .where({
           fulfillment_company_id: records.fulfillment_company_id,
-          dane_code: address.dane_code,
+          dane_code: address.city.dane_code,
           'fulfillment_matrix.type': 'weight',
         })
         .where('min', '<=', totalWeight)
@@ -253,7 +225,7 @@ module.exports = function () {
         .service('envia-colvanes')
         .create({
           action: 'find',
-          destination_city: `${address.dane_code}`,
+          destination_city: `${address.city.dane_code}`,
           city_origin: '08001',
           weight: totalWeight,
           volume,

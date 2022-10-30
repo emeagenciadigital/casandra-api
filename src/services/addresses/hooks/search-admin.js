@@ -6,6 +6,7 @@ const {
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
+const { Op } = require("sequelize");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = function (options = {}) {
@@ -33,16 +34,13 @@ module.exports = function (options = {}) {
       delete context.params.query.data_value;
 
       const ids = await context.app
-        .service("addresses")
+        .service('addresses')
         .getModel()
-        .query()
-        .select("addresses.id")
-        .innerJoin("companies", "companies.id", "=", "addresses.company_id")
-        .orWhere("addresses.name", "LIKE", `%${value}%`)
-        .orWhere("companies.name", "LIKE", `%${value}%`)
-        .orWhere("companies.nit", "LIKE", `%${value}%`)
-        .where("addresses.deletedAt", null)
-        .then((it) => it.map((it) => it.id));
+        .findAll({
+          attributes: ['id'],
+          where: { name: { [Op.like]: `%${value}%` } }
+        })
+        .then(res => res.map(it => it.id))
 
       context.params.query = { id: { $in: ids } };
     }

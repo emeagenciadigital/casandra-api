@@ -28,8 +28,7 @@ const joinsResolves = {
         context.app
           .service("addresses")
           .getModel()
-          .query()
-          .where({ user_id: records.id, deletedAt: null }),
+          .findAll({ where: { user_id: records.id } }),
       ]);
     },
   },
