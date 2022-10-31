@@ -91,6 +91,7 @@ module.exports = async context => {
   return {
     order_id: record.order.id,
     status: WOMPI_ORDER_STATUS[payment.status],
-    gateway_status: payment.status
+    gateway_status: payment.status,
+    url_payment: payment.payment_method.extra.async_payment_url
   }
 }
