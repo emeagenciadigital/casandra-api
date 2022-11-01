@@ -27,13 +27,13 @@ const updatePayment = async (context, transaction, order) => {
         city: transaction.shipping_address.city,
         address: `${transaction.shipping_address.address_line_1} - ${transaction.shipping_address.address_line_2}`,
         payment_method: transaction.payment_method_type
-     }
+    }
 
-     const paymentConfirmationCreated = await context.app
+    const paymentConfirmationCreated = await context.app
         .service('payment-confirmations')
         .create(paymentConfirmation)
 
-     await context.app
+    await context.app
         .service('orders')
         .getModel()
         .query()
@@ -68,16 +68,20 @@ module.exports = () => async context => {
 
     if (checksum !== signature.checksum) throw new Forbidden('checksum not match')
 
+    const orderId = JSON.parse(Buffer.from(transaction.reference).toString('ascii')).order_id
+
+    console.log(orderId)
+
     const order = await context.app.service('orders')
         .getModel()
         .query()
         .where({
-            id: transaction.reference,
+            id: orderId,
             deletedAt: null,
             order_status_id: [1]
         })
         .then(it => it[0])
-    
+
     if (order) return {
         success: false,
         message: 'Order not available!'

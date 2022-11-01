@@ -25,14 +25,40 @@ module.exports = class Wompi {
         return response
     }
 
+    async createPaymentSource(payload) {
+        const response = await this.fetch.post('/payment_sources',
+            payload,
+            {
+                headers: this._getHeaders({ token: this.privKey })
+            }
+        ).then(res => res.data)
+            .catch(err => {
+                throw new GeneralError(err.response.data)
+            })
+        return response
+    }
+
     async createTransaction(payload) {
         const response = await this.fetch.post('/transactions', payload, {
-            headers: this._getHeaders({ token: this.pubKey })
+            headers: this._getHeaders({ token: this.privKey })
         })
             .then(res => res.data)
             .catch(err => {
                 throw new NotAcceptable(err.response.data)
             })
+        return response
+    }
+
+    async voidTransaction(transactionId, amount) {
+        const response = await this.fetch.post(
+            `/transactions/${transactionId}/void`,
+            { amount_in_cents: amount },
+            { headers: this._getHeaders({ token: this.privKey }) }
+        ).then(res => res.data)
+            .catch(err => {
+                throw new NotAcceptable(err.response.data)
+            })
+
         return response
     }
 
@@ -42,6 +68,12 @@ module.exports = class Wompi {
             .catch(err => {
                 throw new NotAcceptable(err.response.data)
             })
+    }
+
+    async getAcceptanceToken() {
+        return await this.createMerchant()
+            .then(res => res.data.presigned_acceptance.acceptance_token)
+            .catch(() => undefined)
     }
 
     async getTransaction(id) {

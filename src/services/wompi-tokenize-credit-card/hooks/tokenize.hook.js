@@ -5,7 +5,7 @@ const brands = {
     'AMEX': 'american-express',
     'MASTERCARD': 'mastercard',
     'VISA': 'visa',
-  }
+}
 
 
 const isValidPayload = (payload, requiredFields) => {
@@ -23,15 +23,28 @@ module.exports = () => async context => {
     const wompi = context.app.get('wompiClient')
 
     const response = await wompi.tokenizeCard(data)
-    
+
     if (response.status === 'CREATED') {
         const responseData = response.data
+
+        const acceptanceToken = await wompi.getAcceptanceToken()
+        if (!acceptanceToken) throw new NotAcceptable('No fué posible crear la tarjeta.')
+
+        const paymentSource = await wompi.createPaymentSource({
+            customer_email: context.params.user.email,
+            type: 'CARD',
+            token: responseData.id,
+            acceptance_token: acceptanceToken,
+        })
+
+        if (!paymentSource) throw new NotAcceptable('No fué posible crear la tarjeta.')
 
         const dataCard = {
             masked_number: responseData.name,
             default: "true",
             brand: brands[responseData.brand] || 'unknown',
             credit_card_token_id: responseData.id,
+            credit_card_source_payment_id: `${paymentSource.data.id}`,
             exp_year: Number(responseData.exp_year),
             exp_month: Number(responseData.exp_month),
             gateway: 'wompi',
