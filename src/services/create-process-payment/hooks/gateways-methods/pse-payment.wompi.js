@@ -1,4 +1,4 @@
-const { NotAcceptable } = require("@feathersjs/errors")
+const { NotAcceptable, GeneralError } = require("@feathersjs/errors")
 const { getItems } = require("feathers-hooks-common")
 const { longPollingData } = require('./utils')
 const { WOMPI_ORDER_STATUS } = require('./constants')
@@ -9,15 +9,19 @@ module.exports = async context => {
   const user = context.params.user
   const shipping_address = JSON.parse(record.order.shipping_address_meta_data)
 
-  if (!record.acceptance_token) throw new NotAcceptable('Acceptance token is required!')
+  // if (!record.acceptance_token) throw new NotAcceptable('Acceptance token is required!')
   if (!record.bank_code) throw new NotAcceptable('Field bank_code is required!')
   if (typeof record.user_type === 'undefined') throw new NotAcceptable('Field type_user is required!')
   if (!record.user_type_dni) throw new NotAcceptable('Field user_type_dni is required!')
   if (!record.user_dni) throw new NotAcceptable('Field user_dni is required!')
 
+  const acceptanceToken = await wompi.getAcceptanceToken()
+
+  if (!acceptanceToken) throw new GeneralError('No fue posible generar el cobro.')
+
   const payload = {
     amount_in_cents: (record.order.total_price * 100000) / 1000,
-    acceptance_token: record.acceptance_token,
+    acceptance_token: acceptanceToken,
     currency: "COP",
     customer_email: user.email,
     payment_method: {
@@ -26,10 +30,10 @@ module.exports = async context => {
       user_legal_id_type: record.user_type_dni,
       user_legal_id: record.user_dni,
       financial_institution_code: record.bank_code,
-      payment_description: `Pago todo en soldaduras ref: ${record.order.id}`,
+      payment_description: `Pago Almacén Sandra ref: ${record.order.id}`,
     },
     redirect_url: record.urlConfirmation,
-    reference: `${record.order.id}`,
+    reference: Buffer.from(JSON.stringify({ order_id: record.order.id, time: new Date().getTime() })).toString('base64'),
     customer_data: {
       phone_number: user.phone,
       full_name: `${user.first_name} ${user.last_name}`

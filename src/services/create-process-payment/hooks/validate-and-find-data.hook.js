@@ -42,7 +42,9 @@ module.exports = () => async context => {
                 'gateway',
                 'brand',
                 'default',
-                'default_payment_fees'
+                'default_payment_fees',
+                'verified_status',
+                'credit_card_source_payment_id',
             ])
             .where({
                 id: record.credit_card_id,
@@ -61,14 +63,14 @@ module.exports = () => async context => {
     ])
 
     if (!order) throw new NotAcceptable('The order not exists.')
-    if (!creditCard && record.payment_method === 'credit_card') throw new NotAcceptable('Then credit card not exists.')
+    if (record.payment_method === 'credit_card') {
+        if (!creditCard) throw new NotAcceptable('Then credit card not exists.')
+        else if (creditCard.verified_status !== 'verified') throw new NotAcceptable('La tarjeta de crédito no ha sido verificada.')
+        else if (record.gateway !== creditCard.gateway) throw new NotAcceptable('Invalid credit card!')
+    }
 
     if (order.payment_method !== 'online')
-        throw new NotAcceptable('Order payment online not allowed')
-
-    if (record.payment_method === 'credit_card') {
-        if (record.gateway !== creditCard.gateway) throw new NotAcceptable('Invalid credit card!')
-    }
+        throw new NotAcceptable('Order type payment not allowed')
 
     record.order = order
     record.creditCard = creditCard

@@ -38,6 +38,11 @@ class usersCreditCards extends Model {
         cell_phone: { type: 'string', maxLength: 255 },
         default_payment_fees: { type: 'integer' },
         deletedAt: { type: 'string', format: 'date-time' },
+        verified_status: { type: 'string', enum: ['pending', 'verified', 'blocked'] },
+        verification_attempts: { type: 'integer' },
+        gateway_verification_ref: { type: 'string' },
+        credit_card_source_payment_id: { type: 'string' },
+        verification_amount: { type: 'integer' },
       },
     };
   }
@@ -97,6 +102,15 @@ module.exports = function (app) {
             table.string('cell_phone', 255);
             table.integer('default_payment_fees');
             table.timestamp('deletedAt').nullable();
+            table.enum('verified_status', [
+              'pending',
+              'verified',
+              'blocked'
+            ]).defaultTo('pending');
+            table.integer('verification_attempts').defaultTo(3);
+            table.integer('verification_amount').nullable()
+            table.string('gateway_verification_ref').nullable()
+            table.string('credit_card_source_payment_id')
             table.timestamp('createdAt');
             table.timestamp('updatedAt');
           })

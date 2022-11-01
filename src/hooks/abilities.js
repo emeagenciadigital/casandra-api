@@ -121,6 +121,8 @@ function defineAbilitiesFor(user, context) {
         'wompi-pse-banks',
       ]);
 
+      can(['create', 'update'], ['wompi-verified-credit-card'])
+
       can('read', ['users'], { id: user.id });
 
       can('read', ['custom-payments', 'purchase-orders'], {

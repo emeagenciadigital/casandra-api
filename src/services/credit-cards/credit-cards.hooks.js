@@ -11,10 +11,26 @@ module.exports = {
     get: [],
     create: [
       iff(isProvider('external'), restrict()),
-      toggleActiveCard(),
     ],
-    update: [],
-    patch: [],
+    update: [restrict()],
+    patch: [
+      discard(
+        'verification_amount',
+        'verified_status',
+        'verification_attempts',
+        'user_id',
+        'credit_card_token_id',
+        'owner_name',
+        'customer_id',
+        'cvv',
+        'type_document',
+        'identification_number',
+        'exp_year',
+        'exp_month',
+        'gateway_verification_ref',
+        'credit_card_source_payment_id',
+      )
+    ],
     remove: [removeSoftDelete()],
   },
 
@@ -32,13 +48,20 @@ module.exports = {
         'address',
         'phone',
         'cell_phone',
-        'deletedAt')
+        'deletedAt',
+        'verification_amount',
+        'gateway_verification_ref',
+        'credit_card_source_payment_id',
+        'credit_card_token_id',
+      )
     ],
     find: [],
     get: [],
-    create: [],
+    create: [
+      toggleActiveCard(),
+    ],
     update: [],
-    patch: [],
+    patch: [toggleActiveCard()],
     remove: [],
   },
 
