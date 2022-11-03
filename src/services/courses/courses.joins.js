@@ -9,7 +9,8 @@ exports.courseDetailJoin = () => (context) => {
         [
           record.category,
           record.sections,
-          record.benefits
+          record.benefits,
+          record.product
         ] = await Promise.all([
           app.service('courses-categories')
             .getModel()
@@ -33,6 +34,13 @@ exports.courseDetailJoin = () => (context) => {
               where: {
                 course_id: record.id
               }
+            }),
+          app.service('products')
+            .getModel()
+            .query()
+            .where({
+              id: record.product_id,
+              deletedAt: null
             })
         ])
       }
