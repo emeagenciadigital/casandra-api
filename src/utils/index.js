@@ -7,6 +7,29 @@ const longPollingData = async (fetch, stop) => {
   return await longPollingData(fetch, stop)
 }
 
+const when = (f) => (map) => (x) => {
+  if (f(x)) return map(x)
+
+  return x
+}
+
+class Container {
+  constructor(x) {
+    this.x = x
+  }
+
+  map(f) {
+    return Container.from(f(this.x))
+  }
+  get() {
+    return this.x
+  }
+  static from(x) {
+    return new Container(x)
+  }
+}
 module.exports = {
-  longPollingData
+  longPollingData,
+  when,
+  Container
 }

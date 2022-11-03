@@ -17,7 +17,8 @@ module.exports = (app) => {
           'recharge',
           'payment',
           'expired',
-          'admin'
+          'admin',
+          'return'
         ),
         allowNull: false,
       },

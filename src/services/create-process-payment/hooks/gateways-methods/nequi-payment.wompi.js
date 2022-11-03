@@ -2,6 +2,7 @@ const { NotAcceptable, GeneralError } = require("@feathersjs/errors")
 const { getItems } = require("feathers-hooks-common")
 const { longPollingData } = require('./utils')
 const { WOMPI_ORDER_STATUS } = require('./constants')
+const { GatewayTypes, UserTransactionType } = require("../../../../models/user-gateway-transactions.model")
 
 module.exports = async context => {
   const wompi = context.app.get('wompiClient')
@@ -45,6 +46,16 @@ module.exports = async context => {
   }
 
   const transaction = await wompi.createTransaction(payload)
+
+  context.app.service('user-gateway-transactions')
+    .getModel()
+    .create({
+      user_id: user.id,
+      gateway: GatewayTypes.WOMPI,
+      amount: record.order.total_price,
+      type: UserTransactionType.PAYMENT,
+      gateway_reference: transaction.data.id,
+    })
 
   const payment = await longPollingData(
     async () => await wompi.getTransaction(transaction.data.id),
@@ -91,6 +102,16 @@ module.exports = async context => {
     })
     .where({
       id: record.order.id,
+    })
+
+  await context.app
+    .service('order-history')
+    .getModel()
+    .query()
+    .insert({
+      order_id: record.order.id,
+      order_status_id: WOMPI_ORDER_STATUS[payment.status],
+      user_id: user.id
     })
 
 

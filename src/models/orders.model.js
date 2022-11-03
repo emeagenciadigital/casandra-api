@@ -61,6 +61,8 @@ class orders extends Model {
         fulfillment_company_id: { type: "integer" },
         fulfillment_company_meta_data: { type: "string" },
         deletedAt: { type: "string", format: "date-time" },
+        amount_paid_from_gateway: { type: 'number' },
+        amount_paid_from_wallet: { type: 'number' }
       },
     };
   }
@@ -124,6 +126,8 @@ module.exports = function (app) {
             table.decimal("total_tax");
             table.decimal("total_shipping_cost");
             table.decimal("total_price_shipping_cost_excl");
+            table.decimal('amount_paid_from_gateway')
+            table.decimal('amount_paid_from_wallet')
             table.text("payment_meta_data");
             table.text("shopping_cart_meta_data");
             table.enum("payment_method", ["online", "cash_on_delivery"]);

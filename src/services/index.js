@@ -79,6 +79,7 @@ const workOffersCategories = require('./work-offers-categories/work-offers-categ
 const userProductViews = require('./user-product-views/user-product-views.service')
 const rawQueries = require('./raw-queries/raw-queries.service')
 const wompiVerifiedCreditCard = require('./wompi-verified-credit-card/wompi-verified-credit-card.service')
+const userGatewayTransactions = require('./user-gateway-transactions/user-gateway-transactions.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -162,4 +163,5 @@ module.exports = function (app) {
   app.configure(userProductViews);
   app.configure(rawQueries);
   app.configure(wompiVerifiedCreditCard);
+  app.configure(userGatewayTransactions);
 };

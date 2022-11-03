@@ -43,6 +43,9 @@ class paymentConfirmations extends Model {
         ind_country: { type: 'string', maxLength: 255 },
         shipping_id: { type: 'integer' },
         deletedAt: { type: 'string', format: 'date-time' },
+        wallet_movement_id: { type: 'integer' },
+        user_id: { type: 'integer' },
+        user_gateway_transaction_id: { type: 'integer' }
       },
     };
   }
@@ -79,7 +82,10 @@ module.exports = function (app) {
             table.string('status');
             table.string('response');
             table.string('authorization');
-            table.enum('gateway', ['epayco']).defaultTo('epayco');
+            table.enum('gateway', ['epayco', 'wompi', 'wallet']).defaultTo('wompi');
+            table.integer('wallet_movement_id')
+            table.integer('user_id').nullable()
+            table.integer('user_gateway_transaction_id').nullable()
             table.string('receipt');
             table.string('date');
             table.string('franchise');

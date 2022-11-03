@@ -8,7 +8,10 @@ module.exports = function (app) {
   };
 
   // Initialize our service with any options it requires
-  app.use('/wompi-webhook-events', new WompiWebhookEvents(options, app));
+  app.use('/wompi-webhook-events', new WompiWebhookEvents(options, app), function (req, res, next) {
+    res.status(200)
+    next()
+  });
 
   // Get our initialized service so that we can register hooks
   const service = app.service('wompi-webhook-events');

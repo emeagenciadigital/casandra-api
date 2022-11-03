@@ -1,13 +1,17 @@
 const { disallow } = require("feathers-hooks-common");
-const createPaymentHook = require("./hooks/create-payment.hook");
-const validateAndFindDataHook = require("./hooks/validate-and-find-data.hook");
+// const createPaymentHook = require("./hooks/create-payment.hook");
+const processPaymentHook = require("./hooks/process-payment.hook");
+// const validateAndFindDataHook = require("./hooks/validate-and-find-data.hook");
 
 module.exports = {
   before: {
-    all: [  ],
+    all: [],
     find: [disallow()],
     get: [disallow()],
-    create: [validateAndFindDataHook()],
+    create: [
+      // validateAndFindDataHook()
+      processPaymentHook()
+    ],
     update: [disallow()],
     patch: [disallow()],
     remove: [disallow()]
@@ -17,7 +21,9 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [createPaymentHook()],
+    create: [
+      // createPaymentHook()
+    ],
     update: [],
     patch: [],
     remove: []
