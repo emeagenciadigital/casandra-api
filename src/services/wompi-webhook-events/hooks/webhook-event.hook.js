@@ -1,13 +1,50 @@
 const { getItems, replaceItems } = require("feathers-hooks-common")
 const crypto = require('crypto')
-const { Forbidden } = require("@feathersjs/errors")
+const { Forbidden, NotFound, NotAcceptable } = require("@feathersjs/errors")
 const { WOMPI_ORDER_STATUS } = require("../../create-process-payment/hooks/gateways-methods/constants")
+const { UserTransactionType, TransactionStatus } = require("../../../models/user-gateway-transactions.model")
 
-const updatePayment = async (context, transaction, order) => {
+const processPaymentOrder = () => async (context) => {
     const wompi = context.app.get('wompiClient')
+    const record = getItems(context)
+    const transaction = record.data.transaction
+
+
+    const orderId = JSON.parse(Buffer.from(transaction.reference, 'base64').toString('ascii')).order_id
+
+    const order = await context.app.service('orders')
+        .getModel()
+        .query()
+        .where({
+            id: orderId,
+            deletedAt: null,
+            order_status_id: 1
+        })
+        .then(it => it[0])
+
+    if (!order) {
+        await context.app
+            .service('user-gateway-transactions')
+            .getModel()
+            .update(
+                {
+                    status: TransactionStatus.PROCESSED
+                },
+                {
+                    where: { gateway_reference: transaction.id }
+                }
+            )
+
+        replaceItems(context, {
+            success: true,
+            message: 'Order already processed'
+        })
+        return context
+    }
+
 
     const paymentConfirmation = {
-        order_id: transaction.reference,
+        order_id: orderId,
         payment_reference: transaction.id,
         invoice: '',
         description: '',
@@ -46,11 +83,150 @@ const updatePayment = async (context, transaction, order) => {
             id: order.id
         })
 
-    return {
+    await context.app
+        .service('order-history')
+        .getModel()
+        .query()
+        .insert({
+            order_id: order.id,
+            order_status_id: WOMPI_ORDER_STATUS[transaction.status],
+        })
+
+    if (order.amount_paid_from_wallet && ['DECLINED', 'VOIDED', 'ERROR'].includes(transaction.status)) {
+        await context.app
+            .service('wallet-movements')
+            .getModel()
+            .create({
+                user_id: order.user_id,
+                type: 'return',
+                amount_net: order.amount_paid_from_wallet,
+                description: `Reembolso de compra ${order.id}`,
+                payment_id: order.id,
+                created_by_user_id: order.user_id,
+            })
+    }
+
+    await context.app
+        .service('user-gateway-transactions')
+        .getModel()
+        .update(
+            { status: TransactionStatus.PROCESSED },
+            { where: { gateway_reference: transaction.id } }
+        )
+
+
+    replaceItems(context, {
         success: true,
         message: 'Order updated'
-    }
+    })
+
+    return context
 }
+
+const processPaymentRecharge = () => async (context) => {
+    const wompi = context.app.get('wompiClient')
+    const record = getItems(context)
+    const transaction = record.data.transaction
+
+
+    const userId = JSON.parse(Buffer.from(transaction.reference, 'base64').toString('ascii')).user_id
+
+    const [user, userTransaction] = await Promise.all([
+        context.app.service('users')
+            .getModel()
+            .query()
+            .where({
+                id: userId,
+                deletedAt: null,
+                status: 'active'
+            })
+            .then(it => it[0]),
+        context.app.service('user-gateway-transactions')
+            .getModel()
+            .findOne({
+                where: { gateway_reference: transaction.id, user_id: userId }
+            })
+    ])
+
+    if (!user) {
+        await context.app
+            .service('user-gateway-transactions')
+            .getModel()
+            .update(
+                {
+                    status: TransactionStatus.PROCESSED
+                },
+                {
+                    where: { gateway_reference: transaction.id }
+                }
+            )
+
+        replaceItems(context, {
+            success: true,
+            message: 'Payment already processed'
+        })
+        return context
+    }
+
+
+    const paymentConfirmation = {
+        user_id: userId,
+        payment_reference: transaction.id,
+        invoice: '',
+        description: '',
+        value: userTransaction.amount,
+        tax: 0,
+        dues: transaction?.payment_method?.installments || 0,
+        currency: 'COP',
+        bank: transaction.payment_method_type,
+        status: transaction.status,
+        response: transaction.status,
+        gateway: 'wompi',
+        date: transaction.created_at,
+        type_document: '',
+        document: '',
+        name: transaction?.payment_method?.extra?.card_holder || '',
+        in_tests: wompi.isTest,
+        city: transaction?.shipping_address?.city || '',
+        address: `${transaction.shipping_address?.address_line_1} - ${transaction.shipping_address?.address_line_2}`,
+        payment_method: transaction.payment_method_type
+    }
+
+    const paymentConfirmationCreated = await context.app
+        .service('payment-confirmations')
+        .create(paymentConfirmation)
+
+    if (transaction.status === 'APPROVED') {
+        await context.app
+            .service('wallet-movements')
+            .getModel()
+            .create({
+                user_id: user.id,
+                type: 'recharge',
+                amount_net: userTransaction.amount,
+                description: `Recarga wallet`,
+                payment_id: paymentConfirmationCreated.id,
+                created_by_user_id: user.id,
+            })
+    }
+
+    await context.app
+        .service('user-gateway-transactions')
+        .getModel()
+        .update(
+            { status: TransactionStatus.PROCESSED },
+            { where: { gateway_reference: transaction.id } }
+        )
+
+
+    replaceItems(context, {
+        success: true,
+        message: 'Payment updated'
+    })
+
+    return context
+}
+
 
 module.exports = () => async context => {
     const record = getItems(context)
@@ -67,33 +243,29 @@ module.exports = () => async context => {
         .digest('hex')
 
     if (checksum !== signature.checksum) throw new Forbidden('checksum not match')
+    if (record.event !== 'transaction.updated') {
+        replaceItems(context, { success: true, message: 'Evento no manejado.' })
+        return context
+    }
 
-    const orderId = JSON.parse(Buffer.from(transaction.reference).toString('ascii')).order_id
-
-    console.log(orderId)
-
-    const order = await context.app.service('orders')
+    const gatewayTransaction = await context.app.service('user-gateway-transactions')
         .getModel()
-        .query()
-        .where({
-            id: orderId,
-            deletedAt: null,
-            order_status_id: [1]
+        .findOne({
+            where: {
+                gateway_reference: transaction.id
+            }
         })
-        .then(it => it[0])
 
-    if (order) return {
-        success: false,
-        message: 'Order not available!'
+    if (!gatewayTransaction) throw new NotFound('Transaction not found.')
+    else if (gatewayTransaction.status === TransactionStatus.PROCESSED) throw new NotAcceptable('Transaction already processed.')
+
+    if (gatewayTransaction.type === UserTransactionType.PAYMENT) {
+        return await processPaymentOrder()(context)
+    } else if (gatewayTransaction.type === UserTransactionType.WALLET_RECHARGE) {
+        return await processPaymentRecharge()(context)
+    } else {
+        replaceItems(context, { message: 'Method no allowed' })
     }
-
-    let response = null
-
-    if (record.data.event === 'transaction.updated') {
-        response = await updatePayment(context, transaction, order)
-    }
-
-    replaceItems(context, response)
 
     return context
 }
