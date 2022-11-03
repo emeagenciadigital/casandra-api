@@ -33,7 +33,6 @@ module.exports = () => {
             )
           }
         })
-        .findOne({ where: { state_id: state.id, id: records.city_id } })
 
       if (!city) throw new NotFound('No se encontró la ciudad enviada.');
 
