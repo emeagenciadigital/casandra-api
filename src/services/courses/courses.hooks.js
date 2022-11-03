@@ -1,4 +1,5 @@
 const { courseDetailJoin } = require("./courses.joins");
+const assignSlugHook = require("./hooks/assign-slug.hook");
 const lastUpdatedHook = require("./hooks/lastUpdated.hook");
 const syncMeilisearchHook = require("./hooks/sync-meilisearch.hook");
 
@@ -17,7 +18,7 @@ module.exports = {
     all: [syncMeilisearchHook()],
     find: [],
     get: [courseDetailJoin()],
-    create: [],
+    create: [assignSlugHook()],
     update: [],
     patch: [],
     remove: [],
