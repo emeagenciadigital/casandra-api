@@ -67,6 +67,12 @@ module.exports = (app) => {
     },
     {
       paranoid: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ['slug']
+        }
+      ],
       hooks: {
         beforeCount(options) {
           options.raw = true
