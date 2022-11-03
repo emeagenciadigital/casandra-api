@@ -15,7 +15,7 @@ class cms extends Model {
       properties: {
         title: { type: "string" },
         body: { type: "text" },
-        status: { type: "string", enum: ["active", "disactive"] },
+        status: { type: "string", enum: ["active", "inactive"] },
         deletedAt: { type: "string", format: "date-time" },
       },
     };
@@ -42,7 +42,7 @@ module.exports = function (app) {
             table.increments("id");
             table.string("title");
             table.text("body");
-            table.enum("status", ["active", "disactive"]);
+            table.enum("status", ["active", "inactive"]);
             table.timestamp("deletedAt").nullable();
             table.timestamp("createdAt");
             table.timestamp("updatedAt");
