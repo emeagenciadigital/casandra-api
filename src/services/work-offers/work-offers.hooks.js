@@ -1,5 +1,5 @@
 const syncMeilisearchHook = require("./hooks/sync-meilisearch.hook");
-const { withCategoryJoin } = require("./work-offers.joins");
+const { withJoins } = require("./work-offers.joins");
 
 module.exports = {
   before: {
@@ -14,8 +14,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
-    get: [withCategoryJoin()],
+    find: [withJoins()],
+    get: [withJoins()],
     create: [syncMeilisearchHook()],
     update: [],
     patch: [syncMeilisearchHook()],

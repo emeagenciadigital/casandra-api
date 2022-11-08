@@ -38,7 +38,7 @@ class usersCreditCards extends Model {
         cell_phone: { type: 'string', maxLength: 255 },
         default_payment_fees: { type: 'integer' },
         deletedAt: { type: 'string', format: 'date-time' },
-        verified_status: { type: 'string', enum: ['pending', 'verified', 'blocked'] },
+        verified_status: { type: 'string', enum: ['pending', 'started', 'verified', 'blocked'] },
         verification_attempts: { type: 'integer' },
         gateway_verification_ref: { type: 'string' },
         credit_card_source_payment_id: { type: 'string' },
@@ -104,6 +104,7 @@ module.exports = function (app) {
             table.timestamp('deletedAt').nullable();
             table.enum('verified_status', [
               'pending',
+              'started',
               'verified',
               'blocked'
             ]).defaultTo('pending');

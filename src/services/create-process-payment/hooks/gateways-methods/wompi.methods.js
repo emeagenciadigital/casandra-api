@@ -1,7 +1,7 @@
 const { NotFound, NotAcceptable, GeneralError } = require("@feathersjs/errors")
 const { replaceItems } = require("feathers-hooks-common")
 const { GatewayTypes, UserTransactionType } = require("../../../../models/user-gateway-transactions.model")
-const { Container, when } = require("../../../../utils")
+const { Container, when, longPollingData } = require("../../../../utils")
 const { WOMPI_ORDER_STATUS } = require("./constants")
 
 const STATUS_PENDING_PAYMENT = 1
@@ -149,7 +149,7 @@ const getGatewayPayload = (type) => ({
         ? {
           type: "BANCOLOMBIA_TRANSFER",
           user_type: "PERSON",
-          ...(process.env.NODE_ENV !== 'production' ? { sandbox_status: 'DECLINED' } : {})
+          ...(process.env.NODE_ENV !== 'production' ? { sandbox_status: 'APPROVED' } : {})
         }
         : {}),
       payment_description: type === 'payment' ? `Pago Almacén Sandra ref: ${order.id}` : 'Recarga wallet Almacén Sandra',
@@ -333,7 +333,18 @@ const createGatewayPayment = (type) => async ({
 }) => {
   const wompi = context.app.get('wompiClient')
 
-  const payment = await wompi.createTransaction(gatewayPayload)
+  const transaction = await wompi.createTransaction(gatewayPayload)
+
+  let payment = null
+
+  if (record.payment_method !== 'credit_card') {
+    payment = await longPollingData(
+      async () => await wompi.getTransaction(transaction.data.id),
+      res => res?.payment_method?.extra?.async_payment_url
+    )
+  } else {
+    payment = transaction.data
+  }
 
   const userGatewayTransaction = await context.app.service('user-gateway-transactions')
     .getModel()
@@ -342,7 +353,7 @@ const createGatewayPayment = (type) => async ({
       gateway: GatewayTypes.WOMPI,
       amount: type === 'payment' ? order.total_price - order.amount_paid_from_wallet : record.amount,
       type: type === 'payment' ? UserTransactionType.PAYMENT : UserTransactionType.WALLET_RECHARGE,
-      gateway_reference: payment.data.id,
+      gateway_reference: payment.id,
     })
 
 
@@ -351,22 +362,22 @@ const createGatewayPayment = (type) => async ({
     .create({
       ...(type === 'payment' ? { order_id: order.id } : { user_gateway_transaction_id: userGatewayTransaction.id }),
       user_id: user.id,
-      payment_reference: payment.data.id,
+      payment_reference: payment.id,
       invoice: '',
       description: '',
       value: type === 'payment' ? parseFloat(order.total_price - order.amount_paid_from_wallet) : record.amount,
       tax: type === 'payment' ? parseFloat(order.total_tax) : 0,
       dues: 0,
       currency: 'COP',
-      bank: payment.data.payment_method_type,
-      status: payment.data.status,
-      response: payment.data.status,
+      bank: payment.payment_method_type,
+      status: payment.status,
+      response: payment.status,
       gateway: 'wompi',
-      date: payment.data.created_at,
+      date: payment.created_at,
       in_tests: wompi.isTest,
-      city: payment?.data?.shipping_address?.city || '',
-      address: `${payment?.data?.shipping_address?.address_line_1} - ${payment.data.shipping_address?.address_line_2}`,
-      payment_method: payment.data.payment_method_type
+      city: payment?.shipping_address?.city || '',
+      address: `${payment?.shipping_address?.address_line_1} - ${payment.shipping_address?.address_line_2}`,
+      payment_method: payment.payment_method_type
     })
 
   if (type === 'payment') {
@@ -390,7 +401,7 @@ const createGatewayPayment = (type) => async ({
     user,
     order,
     gatewayMethod,
-    payment: payment.data,
+    payment,
     record,
     ...otherParams
   }

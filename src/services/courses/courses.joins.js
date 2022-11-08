@@ -47,3 +47,28 @@ exports.courseDetailJoin = () => (context) => {
     }
   })(context)
 }
+
+exports.courseProductJoin = () => (context) => {
+
+  return fastJoin({
+    joins: {
+      join: () => async (record) => {
+        [record.product] = await context.app.service('products')
+          .getModel()
+          .query()
+          .select([
+            'id',
+            'name',
+            'price',
+            'price_with_tax',
+            'discount_price',
+            'discount_price_whit_tax'
+          ])
+          .where({
+            id: record.product_id,
+            deletedAt: null
+          })
+      }
+    }
+  })(context)
+}
