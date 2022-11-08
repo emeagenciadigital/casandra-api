@@ -22,7 +22,7 @@ module.exports = () => async (context) => {
   else if (creditCard.user_id !== user.id) throw new Forbidden('No puedes usar está tarjeta de crédito.')
   else if (creditCard.verified_status === 'verified') throw new NotAcceptable('Esta tarjeta ya está verificada.')
   else if (creditCard.verified_status === 'blocked') throw new NotAcceptable('Superaste el límite de intentos.')
-  else if (creditCard.verification_amount) throw new NotAcceptable('Ya tienes un proceso de verificación con esta tarjeta.')
+  else if (creditCard.verified_status === 'started') throw new NotAcceptable('Ya tienes un proceso de verificación con esta tarjeta.')
 
 
   const min = 1500
@@ -65,13 +65,18 @@ module.exports = () => async (context) => {
     .query()
     .patch({
       gateway_verification_ref: payment.id,
+      verified_status: 'started',
       verification_amount: amount,
     })
     .where({
       id: creditCard.id
     })
 
-  replaceItems(context, { success: true })
+  replaceItems(context, {
+    success: true,
+    credit_card_id: creditCard.id,
+    attempts: creditCard.verification_attempts
+  })
 
   return context
 }
