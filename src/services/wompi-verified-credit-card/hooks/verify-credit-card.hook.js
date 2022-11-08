@@ -22,6 +22,7 @@ module.exports = () => async (context) => {
   else if (creditCard.user_id !== user.id) throw new Forbidden('No puedes usar está tarjeta de crédito.')
   else if (creditCard.verified_status === 'verified') throw new NotAcceptable('Esta tarjeta ya está verificada.')
   else if (creditCard.verified_status === 'blocked') throw new NotAcceptable('Superaste el límite de intentos.')
+  else if (creditCard.verified_status === 'pending') throw new NotAcceptable('Debes iniciar una verificación primero.')
 
   const wompi = context.app.get('wompiClient')
 
@@ -33,7 +34,7 @@ module.exports = () => async (context) => {
       .query()
       .patch({
         verification_attempts: attempts,
-        verified_status: attempts === 0 ? 'blocked' : 'pending'
+        verified_status: attempts === 0 ? 'blocked' : 'started'
       })
       .where({
         id: creditCard.id
@@ -43,7 +44,11 @@ module.exports = () => async (context) => {
       wompi.voidTransaction(creditCard.gateway_verification_ref, (creditCard.verification_amount * 100000) / 1000)
     }
 
-    throw new NotAcceptable('El monto ingresado es inválido.')
+    throw new NotAcceptable('El monto ingresado es inválido', {
+      attempts,
+      credit_card_id: creditCard.id
+    }
+    )
   } else {
     await context.app.service('credit-cards')
       .getModel()
