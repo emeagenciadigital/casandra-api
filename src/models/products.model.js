@@ -114,6 +114,7 @@ class expressProducts extends Model {
         integration_id: { type: "string", maxlength: 255 },
         integration_hash: { type: "text" },
         images: { type: "string", enum: ["true", "false"] },
+        course: { type: "string", enum: ["true", "false"] },
         slug: { type: ["string", "null"] },
         weight: { type: ["number", "null"] },
         heigh: { type: ["number", "null"] },
@@ -195,6 +196,7 @@ module.exports = function (app) {
               table.integer("quantity");
               table.string("code").unique();
               table.enum("images", ["true", "false"]).defaultTo("false");
+              table.enum("course", ["true", "false"]).defaultTo("false");
               table.string("integration_id").unique();
               table.text("integration_hash");
               table.string("slug");

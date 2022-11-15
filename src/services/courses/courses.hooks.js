@@ -1,5 +1,5 @@
 const { iff } = require("feathers-hooks-common");
-const { courseDetailJoin, courseProductJoin } = require("./courses.joins");
+const { courseDetailJoin, courseProductJoin, joinWithUserCourses } = require("./courses.joins");
 const assignSlugHook = require("./hooks/assign-slug.hook");
 const lastUpdatedHook = require("./hooks/lastUpdated.hook");
 const syncMeilisearchHook = require("./hooks/sync-meilisearch.hook");
@@ -23,10 +23,11 @@ module.exports = {
   after: {
     all: [syncMeilisearchHook()],
     find: [
+      courseDetailJoin(),
       iff(validateJoins(), courseDetailJoin()),
       courseProductJoin()
     ],
-    get: [courseDetailJoin()],
+    get: [joinWithUserCourses(), courseDetailJoin()],
     create: [assignSlugHook()],
     update: [],
     patch: [],
