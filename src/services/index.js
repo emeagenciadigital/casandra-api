@@ -81,6 +81,7 @@ const rawQueries = require('./raw-queries/raw-queries.service')
 const wompiVerifiedCreditCard = require('./wompi-verified-credit-card/wompi-verified-credit-card.service')
 const userGatewayTransactions = require('./user-gateway-transactions/user-gateway-transactions.service')
 const processPaymentResponse = require('./process-payment-response/process-payment-response.service')
+const userCourses = require('./user-courses/user-courses.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -166,4 +167,5 @@ module.exports = function (app) {
   app.configure(wompiVerifiedCreditCard);
   app.configure(userGatewayTransactions);
   app.configure(processPaymentResponse);
+  app.configure(userCourses);
 };

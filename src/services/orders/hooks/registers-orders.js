@@ -155,8 +155,6 @@ module.exports = function () {
     records.shopping_cart_id = shoppingCart.id;
     records.total_shipping_cost = shippingCost;
 
-    console.log(shippingCost)
-
     context.dataOrders = {
       data: records,
       shoppingCart: shoppingCart,
@@ -169,14 +167,12 @@ module.exports = function () {
         total_tax: records.total_tax,
         total_price_tax_incl: records.total_price,
         total_price_shipping_cost_excl: records.total_price_shipping_cost_excl,
-        total_price: shippingCost
-          ? parseFloat(shippingCost.price) + records.total_price
-          : 0,
+        total_price: shippingCost + records.total_price
       },
     };
 
     records.shipping_address_meta_data = JSON.stringify({
-      ...JSON.parse(JSON.stringify(address)),
+      ...JSON.parse(JSON.stringify(address || {})),
       seller: records.seller,
       fulfillment_company_id: records.fulfillment_company_id,
     });
@@ -247,11 +243,11 @@ module.exports = function () {
       fulfillment_company_meta_data = {
         price: 0,
       };
-    } else if (!records.fulfillment_company_id) {
+    } else if (!records.fulfillment_company_id && requireShipping) {
       throw new NotAcceptable('Se requiere el método de envío')
     }
 
-    if (!Object.keys(fulfillment_company_meta_data).length)
+    if (!Object.keys(fulfillment_company_meta_data).length && requireShipping)
       throw new NotAcceptable('No se encontró la transportadora.');
 
     fulfillment_company_meta_data.query = {
@@ -263,13 +259,13 @@ module.exports = function () {
     };
 
     records.fulfillment_company_meta_data = JSON.stringify(
-      fulfillment_company_meta_data
+      fulfillment_company_meta_data || {}
     );
 
     //SUMATORIA DEL PRECIO DEL ENVIO
-    records.total_price += fulfillment_company_meta_data.price;
-    records.total_price_tax_excl += fulfillment_company_meta_data.price;
-    records.total_shipping_cost = fulfillment_company_meta_data.price;
+    records.total_price += fulfillment_company_meta_data?.price || 0;
+    records.total_price_tax_excl += fulfillment_company_meta_data?.price || 0;
+    records.total_shipping_cost = fulfillment_company_meta_data?.price || 0;
 
     delete records.address_id;
     delete records.seller;

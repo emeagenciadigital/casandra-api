@@ -21,7 +21,7 @@ exports.courseDetailJoin = () => (context) => {
               include: [
                 {
                   association: 'chapters',
-                  attributes: { exclude: ['path_video'] }
+                  attributes: { exclude: !record.bought ? ['path_video'] : [] }
                 }
               ],
               where: {
@@ -68,6 +68,23 @@ exports.courseProductJoin = () => (context) => {
             id: record.product_id,
             deletedAt: null
           })
+      }
+    }
+  })(context)
+}
+
+exports.joinWithUserCourses = () => (context) => {
+  const user = context.params.user
+  if (!user) return context
+
+  return fastJoin({
+    joins: {
+      join: () => async (record) => {
+        record.bought = await context.app
+          .service('user-courses')
+          .getModel()
+          .findOne({ where: { course_id: record.id, user_id: user.id } })
+          .then((res) => !!res)
       }
     }
   })(context)

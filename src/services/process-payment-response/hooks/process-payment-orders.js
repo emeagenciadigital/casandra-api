@@ -102,15 +102,38 @@ module.exports = (options = {}) => {
 
       for (const key in orderDetails) {
         const orderDetail = orderDetails[key];
-        await context.app
+
+        const product = await context.app
           .service('products')
           .getModel()
           .query()
           .where({ id: orderDetail.product_id })
-          // .andWhere(function () {
-          //   this.where('is_ead', null).orWhere('is_ead', 0)
-          // })
-          .decrement('quantity', orderDetail.quantity);
+          .then(res => res[0])
+
+        if (product) {
+          if (product.course === 'false') {
+            await context.app
+              .service('products')
+              .getModel()
+              .query()
+              .where({ id: orderDetail.product_id })
+              .decrement('quantity', orderDetail.quantity);
+          } else {
+            const productCourses = await context.app
+              .service('courses')
+              .getModel()
+              .findAll({ where: { product_id: product.id, status: 'active' } })
+            await context.app
+              .service('user-courses')
+              .getModel()
+              .bulkCreate(
+                productCourses.map(course => ({
+                  user_id: order.user_id, course_id: course.id
+                }))
+              )
+          }
+        }
+
       }
     }
 
