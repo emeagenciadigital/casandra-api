@@ -29,6 +29,46 @@ module.exports = function () {
     if (!shoppingCart)
       throw new NotFound('No se encontró el carro de compras.');
 
+    const shoppingCartDetails = await context.app
+      .service('shopping-cart-details')
+      .getModel()
+      .query()
+      .select(
+        '*',
+        'products.name AS product_name',
+        'shopping_cart_details.id AS shopping_cart_details_id',
+        'shopping_cart_details.quantity AS shopping_cart_details_quantity',
+        'tax_rule.value AS tax_value',
+        'tax_rule.id AS tax_id',
+        'tax_rule.name AS tax_name',
+        'products.*',
+        'products.id AS product_id',
+        context.app.get('knex').raw(`(
+                SELECT products_media.path
+                FROM products_media
+                WHERE
+                  products_media.product_id = products.id
+                  AND products_media.deletedAt IS NULL
+                ORDER BY products_media.priority DESC
+                LIMIT 1
+              ) AS product_main_image`)
+      )
+      .innerJoin(
+        'products',
+        'shopping_cart_details.product_id',
+        '=',
+        'products.id'
+      )
+      .leftJoin('tax_rule', 'products.tax_rule_id', '=', 'tax_rule.id')
+      .where({
+        shopping_cart_id: shoppingCart.id,
+        'shopping_cart_details.deletedAt': null,
+        'products.deletedAt': null,
+        'products.status': 'active',
+      })
+
+    const requireShipping = shoppingCartDetails.some(it => it.course === 'false')
+
     const where = records.address_id
       ? { id: records.address_id, user_id: user.id }
       : { user_id: user.id, main: 'true' }
@@ -44,56 +84,17 @@ module.exports = function () {
         where
       })
 
-    if (!address) throw new NotFound('No se encontró la dirección.');
+    if (!address && requireShipping) throw new NotFound('No se encontró la dirección.');
 
     //activar cuando se configuren los poligonos
 
-    const shippingCost = await context.app
-      .service('search-shipping-cost')
-      .find({ query: { address_id: address.id } })
-      .then((it) => (it.shippingCost ? it.shippingCost : 0));
+    const shippingCost = requireShipping
+      ? await context.app
+        .service('search-shipping-cost')
+        .find({ query: { address_id: address.id } })
+        .then((it) => (it.shippingCost ? it.shippingCost : 0))
+      : 0
 
-    // const shippingCost = 0;
-
-    const [shoppingCartDetails] = await Promise.all([
-      context.app
-        .service('shopping-cart-details')
-        .getModel()
-        .query()
-        .select(
-          '*',
-          'products.name AS product_name',
-          'shopping_cart_details.id AS shopping_cart_details_id',
-          'shopping_cart_details.quantity AS shopping_cart_details_quantity',
-          'tax_rule.value AS tax_value',
-          'tax_rule.id AS tax_id',
-          'tax_rule.name AS tax_name',
-          'products.*',
-          'products.id AS product_id',
-          context.app.get('knex').raw(`(
-              SELECT products_media.path
-              FROM products_media
-              WHERE
-                products_media.product_id = products.id
-                AND products_media.deletedAt IS NULL
-              ORDER BY products_media.priority DESC
-              LIMIT 1
-            ) AS product_main_image`)
-        )
-        .innerJoin(
-          'products',
-          'shopping_cart_details.product_id',
-          '=',
-          'products.id'
-        )
-        .leftJoin('tax_rule', 'products.tax_rule_id', '=', 'tax_rule.id')
-        .where({
-          shopping_cart_id: shoppingCart.id,
-          'shopping_cart_details.deletedAt': null,
-          'products.deletedAt': null,
-          'products.status': 'active',
-        }),
-    ]);
 
     let discount = null
     let totalDiscount = null

@@ -2,7 +2,7 @@ const { NotFound, NotAcceptable, GeneralError } = require("@feathersjs/errors")
 const { replaceItems } = require("feathers-hooks-common")
 const { GatewayTypes, UserTransactionType } = require("../../../../models/user-gateway-transactions.model")
 const { Container, when, longPollingData } = require("../../../../utils")
-const { WOMPI_ORDER_STATUS } = require("./constants")
+// const { WOMPI_ORDER_STATUS } = require("./constants")
 
 const STATUS_PENDING_PAYMENT = 1
 const ID_URL_CONFIRMATION = 1
@@ -155,7 +155,7 @@ const getGatewayPayload = (type) => ({
       payment_description: type === 'payment' ? `Pago Almacén Sandra ref: ${order.id}` : 'Recarga wallet Almacén Sandra',
     },
     redirect_url: urlConfirmation,
-    reference: Buffer.from(JSON.stringify({ user_id: user.id, time: new Date().getTime() })).toString('base64'),
+    reference: Buffer.from(JSON.stringify({ ...(type === 'payment' ? { order_id: order.id } : { user_id: user.id }), time: new Date().getTime() })).toString('base64'),
     customer_data: {
       phone_number: user.phone,
       full_name: `${user.first_name} ${user.last_name}`
@@ -201,7 +201,7 @@ const payOrderFromWallet = async ({ context, user, order, ...otherParams }) => {
   if (walletAmount) {
     order.amount_paid_from_wallet = walletAmount
     order.amount_paid_from_gateway = order.total_price - walletAmount
-    order.order_status_id = walletAmount === order.total_price ? 3 : 1
+    // order.order_status_id = walletAmount === order.total_price ? 3 : 1
 
     const walletMovement = await context.app.service('wallet-movements')
       .getModel()
@@ -220,7 +220,7 @@ const payOrderFromWallet = async ({ context, user, order, ...otherParams }) => {
       .patch({
         amount_paid_from_wallet: order.amount_paid_from_wallet,
         amount_paid_from_gateway: order.amount_paid_from_gateway,
-        order_status_id: order.order_status_id,
+        // order_status_id: order.order_status_id,
       })
       .where({ id: order.id })
 
@@ -266,27 +266,27 @@ const saveOrderPaymentAndConfirm = async ({
       date: new Date().toISOString(),
     })
 
-  await context.app
-    .service('orders')
-    .getModel()
-    .query()
-    .patch({
-      payment_confirmation_id: paymentConfirmation.id,
-      payment_meta_data: JSON.stringify(paymentConfirmation),
-    })
-    .where({
-      id: order.id
-    })
+  const processPaymentData = {
+    order_id: order.id,
+    type: 'orders',
+    response_code: 'approved',
+    payment_info: paymentConfirmation
+  }
 
-  await context.app
-    .service('order-history')
-    .getModel()
-    .query()
-    .insert({
-      order_id: order.id,
-      order_status_id: order.order_status_id,
-      user_id: user.id,
-    })
+  await Promise.all([
+    context.app.service('process-payment-response').create(processPaymentData),
+    context.app
+      .service('orders')
+      .getModel()
+      .query()
+      .patch({
+        payment_confirmation_id: paymentConfirmation.id,
+        payment_meta_data: JSON.stringify(paymentConfirmation),
+      })
+      .where({
+        id: order.id
+      }),
+  ])
 
   return {
     context,
@@ -337,7 +337,7 @@ const createGatewayPayment = (type) => async ({
 
   let payment = null
 
-  if (record.payment_method !== 'credit_card') {
+  if (!record.payment_method.includes('credit_card')) {
     payment = await longPollingData(
       async () => await wompi.getTransaction(transaction.data.id),
       res => res?.payment_method?.extra?.async_payment_url
@@ -345,6 +345,7 @@ const createGatewayPayment = (type) => async ({
   } else {
     payment = transaction.data
   }
+
 
   const userGatewayTransaction = await context.app.service('user-gateway-transactions')
     .getModel()
@@ -388,7 +389,7 @@ const createGatewayPayment = (type) => async ({
       .patch({
         payment_confirmation_id: paymentConfirmationCreated.id,
         payment_meta_data: JSON.stringify(payment),
-        order_status_id: WOMPI_ORDER_STATUS[payment.status]
+        // order_status_id: WOMPI_ORDER_STATUS[payment.status]
       })
       .where({
         id: order.id,

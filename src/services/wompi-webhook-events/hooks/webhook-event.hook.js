@@ -1,7 +1,7 @@
 const { getItems, replaceItems } = require("feathers-hooks-common")
 const crypto = require('crypto')
 const { Forbidden, NotFound, NotAcceptable } = require("@feathersjs/errors")
-const { WOMPI_ORDER_STATUS } = require("../../create-process-payment/hooks/gateways-methods/constants")
+// const { WOMPI_ORDER_STATUS } = require("../../create-process-payment/hooks/gateways-methods/constants")
 const { UserTransactionType, TransactionStatus } = require("../../../models/user-gateway-transactions.model")
 
 const processPaymentOrder = () => async (context) => {
@@ -9,6 +9,13 @@ const processPaymentOrder = () => async (context) => {
     const record = getItems(context)
     const transaction = record.data.transaction
 
+    const STATUS = {
+        PENDING: 'pending',
+        APPROVED: 'approved',
+        DECLINED: 'rejected',
+        VOIDED: 'cancelled',
+        ERROR: 'failure',
+    }
 
     const orderId = JSON.parse(Buffer.from(transaction.reference, 'base64').toString('ascii')).order_id
 
@@ -42,6 +49,13 @@ const processPaymentOrder = () => async (context) => {
         return context
     }
 
+    const processPaymentData = {
+        order_id: order.id,
+        response_code: STATUS[transaction.status],
+        payment_info: transaction,
+        type: 'orders',
+    }
+
 
     const paymentConfirmation = {
         order_id: orderId,
@@ -66,9 +80,12 @@ const processPaymentOrder = () => async (context) => {
         payment_method: transaction.payment_method_type
     }
 
-    const paymentConfirmationCreated = await context.app
-        .service('payment-confirmations')
-        .create(paymentConfirmation)
+    const [paymentConfirmationCreated] = await Promise.all([
+        context.app
+            .service('payment-confirmations')
+            .create(paymentConfirmation),
+        context.app.service('process-payment-response').create(processPaymentData)
+    ])
 
     await context.app
         .service('orders')
@@ -77,20 +94,20 @@ const processPaymentOrder = () => async (context) => {
         .patch({
             payment_confirmation_id: paymentConfirmationCreated.id,
             payment_meta_data: JSON.stringify(transaction),
-            order_status_id: WOMPI_ORDER_STATUS[transaction.status]
+            // order_status_id: WOMPI_ORDER_STATUS[transaction.status]
         })
         .where({
             id: order.id
         })
 
-    await context.app
-        .service('order-history')
-        .getModel()
-        .query()
-        .insert({
-            order_id: order.id,
-            order_status_id: WOMPI_ORDER_STATUS[transaction.status],
-        })
+    // await context.app
+    //     .service('order-history')
+    //     .getModel()
+    //     .query()
+    //     .insert({
+    //         order_id: order.id,
+    //         order_status_id: WOMPI_ORDER_STATUS[transaction.status],
+    //     })
 
     if (order.amount_paid_from_wallet && ['DECLINED', 'VOIDED', 'ERROR'].includes(transaction.status)) {
         await context.app
