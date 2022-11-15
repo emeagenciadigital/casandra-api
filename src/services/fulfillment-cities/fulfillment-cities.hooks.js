@@ -15,9 +15,7 @@ const resolves = {
         context.app
           .service("locations-cities")
           .getModel()
-          .query()
-          .where({ id: records.location_city_id })
-          .then((it) => it[0]),
+          .findByPk(records.location_city_id)
       ]);
     },
   },
