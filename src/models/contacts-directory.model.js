@@ -10,6 +10,10 @@ module.exports = (app) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       city_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
@@ -56,6 +60,12 @@ module.exports = (app) => {
     },
     {
       paranoid: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ['slug']
+        }
+      ],
       hooks: {
         beforeCount(options) {
           options.raw = true

@@ -9,6 +9,10 @@ module.exports = (app) => {
       path_cover: {
         type: DataTypes.STRING,
       },
+      slug: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       job: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -56,6 +60,12 @@ module.exports = (app) => {
     },
     {
       paranoid: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ['slug']
+        }
+      ],
       hooks: {
         beforeCount(options) {
           options.raw = true
