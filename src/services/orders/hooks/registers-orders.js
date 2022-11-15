@@ -155,6 +155,8 @@ module.exports = function () {
     records.shopping_cart_id = shoppingCart.id;
     records.total_shipping_cost = shippingCost;
 
+    console.log(shippingCost)
+
     context.dataOrders = {
       data: records,
       shoppingCart: shoppingCart,
@@ -272,8 +274,6 @@ module.exports = function () {
     delete records.address_id;
     delete records.seller;
     delete records.fulfillment_company_service_code;
-
-    console.log(records)
 
     // Place the modified records back in the context.
     replaceItems(context, records);
