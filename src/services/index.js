@@ -82,6 +82,11 @@ const wompiVerifiedCreditCard = require('./wompi-verified-credit-card/wompi-veri
 const userGatewayTransactions = require('./user-gateway-transactions/user-gateway-transactions.service')
 const processPaymentResponse = require('./process-payment-response/process-payment-response.service')
 const userCourses = require('./user-courses/user-courses.service')
+const priceList = require('./price-list/price-list.service')
+const priceListPrices = require('./price-list-prices/price-list-prices.service')
+const priceListCustomerGroups = require('./price-list-customer-groups/price-list-customer-groups.service')
+const customerGroup = require('./customer-group/customer-group.service')
+const customerGroupCustomers = require('./customer-group-customers/customer-group-customers.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -168,4 +173,9 @@ module.exports = function (app) {
   app.configure(userGatewayTransactions);
   app.configure(processPaymentResponse);
   app.configure(userCourses);
+  app.configure(priceList);
+  app.configure(priceListPrices);
+  app.configure(priceListCustomerGroups);
+  app.configure(customerGroup);
+  app.configure(customerGroupCustomers);
 };
