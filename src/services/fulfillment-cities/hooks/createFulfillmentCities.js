@@ -3,6 +3,7 @@
 const moment = require("moment");
 
 const { getItems, replaceItems } = require("feathers-hooks-common");
+const { NotFound } = require("@feathersjs/errors");
 
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
@@ -21,9 +22,7 @@ module.exports = (options = {}) => {
       context.app
         .service("locations-cities")
         .getModel()
-        .query()
-        .where({ id: records.location_city_id, deletedAt: null })
-        .then((it) => it[0]),
+        .findByPk(records.location_city_id),
     ]);
 
     if (!fulfillmentCompany)

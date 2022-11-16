@@ -6,7 +6,8 @@ const withAllData = (record) => async (context) => {
     ;[
       record.category,
       record.sections,
-      record.benefits
+      record.benefits,
+      record.product
     ] = await Promise.all([
       app.service('courses-categories')
         .getModel()
@@ -30,7 +31,12 @@ const withAllData = (record) => async (context) => {
           where: {
             course_id: record.id
           }
-        })
+        }),
+      app.service('products')
+        .getModel()
+        .query()
+        .where({ id: record.product_id })
+        .then(it => it[0])
     ])
 
   return record
