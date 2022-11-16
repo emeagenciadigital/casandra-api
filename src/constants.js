@@ -17,4 +17,9 @@ exports.SEQUELIZE_MODELS = [
   'wallet-bonus',
   'user-product-views',
   'addresses',
+  'customer-group',
+  'customer-group-customers',
+  'price-list',
+  'price-list-customer-groups',
+  'price-list-prices'
 ]
