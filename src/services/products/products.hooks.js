@@ -26,6 +26,7 @@ const sanitationProductName = require('./hooks/sanitation-product-name');
 // const removeSoftDelete = require('../../hooks/remove-softdelete');
 const updateIntegrationHash = require('./hooks/updateIntegrationHash');
 const assignLabelToProducts = require('../../hooks/assignLabelToProducts');
+const getPriceFromPriceListHook = require('./hooks/get-price-from-price-list.hook');
 
 const updateLabelProduct = () => context =>
   assignLabelToProducts(undefined, context.result.id)(context)
@@ -72,8 +73,8 @@ module.exports = {
     all: [
       fastJoin(joinGet),
     ],
-    find: [],
-    get: [],
+    find: [getPriceFromPriceListHook()],
+    get: [getPriceFromPriceListHook()],
     create: [
       assingSlug(),
       updateLabelProduct(),

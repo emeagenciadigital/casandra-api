@@ -10,6 +10,7 @@ const { NotFound, NotAcceptable } = require('@feathersjs/errors');
 const calculateDataFulfillmentCompany = require('../../../hooks/calculateDataFulfillmentCompany');
 const calculateVolume = require('../../../hooks/calculate-volume');
 const verifyDiscount = require('../../discounts/utils/verify');
+const { getProductPrices } = require('../../../utils/price-list/prices');
 
 module.exports = function () {
   return async (context) => {
@@ -124,12 +125,17 @@ module.exports = function () {
 
     let priceLists = null;
 
+    const productsPrices = await getProductPrices(user)(
+      shoppingCartDetails.map(it => it.product_id)
+    )(context)
+
     for (const product of shoppingCartDetails) {
       const productTaxValue = product.tax_value ? product.tax_value : 0;
+      const productPriceList = productsPrices.find(it => it.product_id === product.product_id)
 
-      let productPrice = product.discount_price
-        ? product.discount_price
-        : product.price;
+      let productPrice = productPriceList.discount_price
+        ? productPriceList.discount_price
+        : productPriceList.price;
 
       const tax = (productTaxValue / 100) * productPrice;
 
