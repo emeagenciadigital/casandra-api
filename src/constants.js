@@ -21,5 +21,7 @@ exports.SEQUELIZE_MODELS = [
   'customer-group-customers',
   'price-list',
   'price-list-customer-groups',
-  'price-list-prices'
+  'price-list-prices',
+  'user-work-offers',
+  'banner-products'
 ]

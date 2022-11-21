@@ -18,11 +18,27 @@ class banners extends Model {
         priority: { type: "integer" },
         type: {
           type: "string",
-          enum: ["HOME", "OFFERS", "POPUP", "ACADEMY"],
+          enum: ["HOME", "OFFERS", "POPUP", "ACADEMY", "FLASH_SALE"],
         },
         status: {
           type: "string",
           enum: ["active", "inactive"],
+        },
+        action_type: {
+          type: 'string',
+          enum: ["BANNER_PRODUCTS", 'CATEGORY', 'PRODUCT', 'URL', 'COURSE'],
+        },
+        url: {
+          type: 'string',
+        },
+        action_id: {
+          type: 'number',
+        },
+        start_date: {
+          type: 'date-tim'
+        },
+        end_date: {
+          type: 'date-tim'
         },
         deletedAt: { type: "date-tim" },
       },
@@ -51,12 +67,16 @@ module.exports = function (app) {
             table.text("path_movile");
             table.text("path_desktop");
             table.integer("priority").defaultTo(1);
-            table.enum('type', ["HOME", "OFFERS", "POPUP", "ACADEMY"]);
+            table.integer("action_id")
+            table.enum('type', ["HOME", "OFFERS", "POPUP", "ACADEMY", "FLASH_SALE"]);
+            table.enum('action_type', ["BANNER_PRODUCTS", 'CATEGORY', 'PRODUCT', 'URL', 'COURSE']);
             table.enum('status', ["active", "inactive"]).defaultTo('active');
             table.text("url");
-            table.timestamp("deletedAt").nullable();
+            table.timestamp("start_date").nullable();
+            table.timestamp("end_date").nullable();
             table.timestamp("createdAt");
             table.timestamp("updatedAt");
+            table.timestamp("deletedAt").nullable();
           })
           .then(() => { }) // eslint-disable-line no-console
           .catch(() => { }); // eslint-disable-line no-console

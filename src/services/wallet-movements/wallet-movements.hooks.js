@@ -1,5 +1,6 @@
 const { iff, isProvider, discard } = require('feathers-hooks-common');
 const addCreateByUserIdHook = require('./hooks/add-create-by-user-id.hook');
+const { withUserJoin } = require('./wallet-movements.joins');
 
 const discardFields = () => iff(
   isProvider('external'),
@@ -27,7 +28,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [withUserJoin()],
     get: [],
     create: [],
     update: [],

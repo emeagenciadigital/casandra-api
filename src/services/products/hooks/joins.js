@@ -1,3 +1,5 @@
+const moment = require('moment')
+
 const joinGet = {
   joins: {
     join: () => async (records, context) => {
@@ -7,7 +9,7 @@ const joinGet = {
       [
         records.media,
         records.brand,
-        tax,
+        records.tax,
         records.category,
         records.category_2,
         records.category_3,
@@ -71,6 +73,28 @@ const joinGet = {
             "products_characteristics.deletedAt": null,
           }),
       ]);
+
+      const now = moment('2022-11-19 09:00:00').utcOffset(-5)
+      const limitHourToFastShipment = moment(now)
+        .set('h', 12)
+        .set('m', 0)
+        .set('s', 0)
+        .utcOffset(-5)
+      const weekDay = now.day()
+      const businessDays = [1, 2, 3, 4, 5]
+
+      let daysOfShipment = 0
+      if (now.isBefore(limitHourToFastShipment) || !businessDays.includes(weekDay)) {
+        daysOfShipment = 2
+      } else {
+        daysOfShipment = 3
+      }
+
+      if (now.day() === 0) now.add('days', 1)
+      else if (now.day() === 6) now.add('days', 2)
+      now.add('days', daysOfShipment)
+
+      records.estimated_delivery_date = now.format('DD-MM-YYYY')
     },
   },
 };
