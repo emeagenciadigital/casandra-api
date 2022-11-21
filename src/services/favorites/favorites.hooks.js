@@ -9,7 +9,7 @@ const resolves = {
       let query = null;
       switch (records.type) {
         case "product":
-          service = "express-products";
+          service = "products";
           query = { id: records.type_id, deletedAt: null };
           break;
         case "brand":
@@ -52,38 +52,33 @@ const resolves = {
           .query()
           .where(query)
           .then((it) => it[0]);
-      } else if (service == "express-products")
+      } else if (service == "products")
         records.favorite = await context.app
           .service(service)
           .getModel()
           .query()
           .select(
-            "express_products.id",
-            "express_products.name",
-            "express_products.price",
-            "express_products.regular_price",
-            "express_products.shop_type",
-            "express_products.status",
-            "express_products.type AS type",
-            "express_products.regular_price",
-            "express_products_media.type AS type_media",
-            "express_products_media.source_path AS main_image",
-            "express_products_media.video_cover_path",
-            "express_products_media.id AS express_products_media_id"
+            "products.id",
+            "products.name",
+            "products.price",
+            "products.price_with_tax",
+            "products.discount_price",
+            "products.discount_price_whit_tax",
+            "products.status",
+            "products_media.type AS type_media",
+            "products_media.path AS main_image",
+            "products_media.id AS products_media_id"
           )
           .innerJoin(
-            "express_products_media",
-            "express_products.id",
+            "products_media",
+            "products.id",
             "=",
-            "express_products_media.product_id"
+            "products_media.product_id"
           )
           .where({
-            "express_products.id": records.type_id,
-            "express_products.deletedAt": null,
-            "express_products_media.main": "true",
-            "express_products_media.media_type": "normal",
-            /* "express_products_media.type": "image", */
-            "express_products_media.deletedAt": null,
+            "products.id": records.type_id,
+            "products.deletedAt": null,
+            "products_media.deletedAt": null,
           })
           .then((it) => it[0]);
       else if (service == "coffee-shop-products")

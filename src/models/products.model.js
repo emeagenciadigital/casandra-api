@@ -121,6 +121,8 @@ class expressProducts extends Model {
         width: { type: ["number", "null"] },
         long: { type: ["number", "null"] },
         position_more_sales: { type: ["number", "null"] },
+        user_guide_composition: { type: ['string', 'null'] },
+        user_guide_care: { type: ['string', 'null'] }
         // label_id: { type: ['integer', null] },
         // label_name: { type: 'string' },
         // label_position: { type: 'string' },
@@ -220,6 +222,8 @@ module.exports = function (app) {
               table.timestamp("deletedAt").nullable();
               table.timestamp("createdAt");
               table.timestamp("updatedAt");
+              table.text('user_guide_composition', 'longtext').nullable();
+              table.text('user_guide_care', 'longtext').nullable();
             })
             .then(() => console.log("Created products table")) // eslint-disable-line no-console
             .catch((e) => console.error("Error creating products table", e)); // eslint-disable-line no-console

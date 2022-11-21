@@ -6,6 +6,7 @@ const {
   getItems,
   replaceItems,
 } = require("feathers-hooks-common");
+const { QueryTypes } = require("sequelize");
 // const algolia = require("../../../utils/algolia");
 
 async function getCategories(context, categories, categoryId) {
@@ -89,6 +90,18 @@ module.exports = function (options = {}) {
         contentCategoriesId.push(categoriesId);
       }
 
+      const productBannersIds = await context.app.get('sequelizeClient')
+        .query(`
+          select banner_products.banner_id
+          from banner_products
+                  inner join banners on banner_products.banner_id = banners.id
+              and banners.deletedAt is null
+              and banners.status = 'active'
+              and if(banners.type = 'FLASH_SALE', now() between banners.start_date and banners.end_date, true)
+          where banner_products.deletedAt is null
+          and banner_products.product_id = ${records.id}`, { type: QueryTypes.SELECT })
+        .then(res => res.map(it => it.banner_id))
+
       records.categories = categories;
 
       // records.price_with_tax += (records.price * records.tax_rule.value) / 100;
@@ -96,10 +109,10 @@ module.exports = function (options = {}) {
       // records.id = `product-${records.id}`
       records.createdAtUnix = Math.floor(records.createdAt / 1000);
       records.updatedAtUnix = Math.floor(records.updatedAt / 1000);
-
       records.category_path_ids = records.category_path_ids
         .substr(1, records.category_path_ids.length - 2)
         .split("-");
+      records.banner_products = productBannersIds
 
       // Algolia.save(records);
       meilisearch.patch(null, {

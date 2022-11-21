@@ -87,6 +87,8 @@ const priceListPrices = require('./price-list-prices/price-list-prices.service')
 const priceListCustomerGroups = require('./price-list-customer-groups/price-list-customer-groups.service')
 const customerGroup = require('./customer-group/customer-group.service')
 const customerGroupCustomers = require('./customer-group-customers/customer-group-customers.service')
+const userWorkOffers = require('./user-work-offers/user-work-offers.service')
+const bannerProducts = require('./banner-products/banner-products.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -178,4 +180,6 @@ module.exports = function (app) {
   app.configure(priceListCustomerGroups);
   app.configure(customerGroup);
   app.configure(customerGroupCustomers);
+  app.configure(userWorkOffers);
+  app.configure(bannerProducts);
 };

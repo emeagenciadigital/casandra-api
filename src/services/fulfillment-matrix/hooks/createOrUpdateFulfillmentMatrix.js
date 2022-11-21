@@ -22,9 +22,7 @@ module.exports = (options = {}) => {
       context.app
         .service("locations-cities")
         .getModel()
-        .query()
-        .where({ id: records.destination_city_id, deletedAt: null })
-        .then((it) => it[0]),
+        .findByPk(records.destination_city_id),
     ]);
 
     if (!fulfillmentCOmpany)

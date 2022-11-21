@@ -13,7 +13,7 @@ module.exports = (options = {}) => {
     let query = null;
     switch (records.type) {
       case "product":
-        service = "express-products";
+        service = "products";
         query = { id: records.type_id, deletedAt: null };
         break;
       case "brand":
