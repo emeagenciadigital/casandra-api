@@ -1,4 +1,5 @@
-const { fastJoin } = require("feathers-hooks-common")
+const { fastJoin, getItems } = require("feathers-hooks-common")
+const { getProductPrices } = require("../../utils/price-list/prices")
 
 exports.courseDetailJoin = () => (context) => {
   const app = context.app
@@ -10,7 +11,6 @@ exports.courseDetailJoin = () => (context) => {
           record.category,
           record.sections,
           record.benefits,
-          record.product
         ] = await Promise.all([
           app.service('courses-categories')
             .getModel()
@@ -34,13 +34,6 @@ exports.courseDetailJoin = () => (context) => {
               where: {
                 course_id: record.id
               }
-            }),
-          app.service('products')
-            .getModel()
-            .query()
-            .where({
-              id: record.product_id,
-              deletedAt: null
             })
         ])
       }
@@ -48,12 +41,19 @@ exports.courseDetailJoin = () => (context) => {
   })(context)
 }
 
-exports.courseProductJoin = () => (context) => {
+exports.courseProductJoin = () => async (context) => {
+
+  const records = getItems(context)
+  const user = context.params.user
+  const productIds = (Array.isArray(records) ? records : [records])
+    .map(it => it.product_id)
+
+  const prices = await getProductPrices(user)(productIds)(context)
 
   return fastJoin({
     joins: {
       join: () => async (record) => {
-        [record.product] = await context.app.service('products')
+        record.product = await context.app.service('products')
           .getModel()
           .query()
           .select([
@@ -68,6 +68,11 @@ exports.courseProductJoin = () => (context) => {
             id: record.product_id,
             deletedAt: null
           })
+          .then(res => res[0] || {})
+          .then(res => ({
+            ...res,
+            ...(prices.find(it => it.product_id === res.id) || {})
+          }))
       }
     }
   })(context)

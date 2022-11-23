@@ -1,4 +1,5 @@
 const { iff, isProvider, disallow } = require("feathers-hooks-common");
+const { withCoursesAndChaptersViews } = require("./user-courses.joins");
 
 module.exports = {
   before: {
@@ -13,8 +14,8 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
-    get: [],
+    find: [withCoursesAndChaptersViews()],
+    get: [withCoursesAndChaptersViews()],
     create: [],
     update: [],
     patch: [],
