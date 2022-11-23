@@ -74,7 +74,7 @@ const joinGet = {
           }),
       ]);
 
-      const now = moment('2022-11-19 09:00:00').utcOffset(-5)
+      const now = moment().utcOffset(-5)
       const limitHourToFastShipment = moment(now)
         .set('h', 12)
         .set('m', 0)
