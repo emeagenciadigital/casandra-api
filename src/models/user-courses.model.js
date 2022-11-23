@@ -13,6 +13,11 @@ module.exports = (app) => {
       course_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      progress: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: '0%',
       }
     },
     {
@@ -31,6 +36,12 @@ module.exports = (app) => {
       onUpdate: 'CASCADE',
       onDelete: 'RESTRICT',
       as: 'course'
+    })
+    userCourses.hasMany(models.user_course_chapter_views, {
+      foreignKey: 'user_course_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'RESTRICT',
+      as: 'chapter_views'
     })
   }
 

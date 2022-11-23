@@ -124,7 +124,7 @@ function defineAbilitiesFor(user, context) {
 
       can(['create', 'update'], ['wompi-verified-credit-card'])
 
-      can('read', ['users'], { id: user.id });
+      can('read', ['users', 'user-courses'], { id: user.id });
 
       can('read', ['custom-payments', 'purchase-orders'], {
         company_id: user.company_id,
