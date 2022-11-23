@@ -12,7 +12,6 @@ module.exports = (app) => {
       },
       slug: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       status: {
         type: DataTypes.ENUM('active', 'inactive'),

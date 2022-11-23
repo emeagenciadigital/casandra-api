@@ -4,8 +4,8 @@ const { default: slugify } = require("slugify")
 module.exports = () => async (context) => {
   const record = getItems(context)
 
-  if (record.name) {
-    const slugName = slugify(record.name.toLowerCase(), {
+  if (record.name && !record.slug) {
+    const slugName = slugify(`${record.id} ${record.name.toLowerCase()}`, {
       remove: /[*+~.()/'"!:@]/g,
     })
     await context.app
