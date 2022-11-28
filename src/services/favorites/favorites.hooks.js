@@ -65,6 +65,8 @@ const resolves = {
             "products.discount_price",
             "products.discount_price_whit_tax",
             "products.status",
+            "products.slug",
+            "products.course",
             "products_media.type AS type_media",
             "products_media.path AS main_image",
             "products_media.id AS products_media_id"
