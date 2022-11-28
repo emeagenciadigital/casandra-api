@@ -79,6 +79,7 @@ const productsJoins = {
               'products.discount_price_whit_tax',
               'products.status',
               'products.tax_rule_id',
+              'products.course',
               'tax_rule.value AS tax_rule_value',
               'products.deletedAt',
             )
