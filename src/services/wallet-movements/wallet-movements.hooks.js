@@ -9,7 +9,7 @@ const discardFields = () => iff(
     'payment_id',
     'bonus_id',
     'bonus_name',
-    'expired_day',
+    // 'expired_day',
     'expired_status',
     'expired_wallet_movement_id',
   )
