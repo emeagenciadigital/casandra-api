@@ -35,7 +35,8 @@ const processPaymentOrder = () => async (context) => {
             .getModel()
             .update(
                 {
-                    status: TransactionStatus.PROCESSED
+                    status: TransactionStatus.PROCESSED,
+                    gateway_status: 'FAILED'
                 },
                 {
                     where: { gateway_reference: transaction.id }
@@ -127,7 +128,7 @@ const processPaymentOrder = () => async (context) => {
         .service('user-gateway-transactions')
         .getModel()
         .update(
-            { status: TransactionStatus.PROCESSED },
+            { status: TransactionStatus.PROCESSED, gateway_status: transaction.status },
             { where: { gateway_reference: transaction.id } }
         )
 
@@ -171,7 +172,8 @@ const processPaymentRecharge = () => async (context) => {
             .getModel()
             .update(
                 {
-                    status: TransactionStatus.PROCESSED
+                    status: TransactionStatus.PROCESSED,
+                    gateway_status: 'FAILED'
                 },
                 {
                     where: { gateway_reference: transaction.id }
@@ -213,7 +215,7 @@ const processPaymentRecharge = () => async (context) => {
         .service('payment-confirmations')
         .create(paymentConfirmation)
 
-    if (transaction.status === 'APPROVED') {
+    if (transaction.status === 'APPROVED' && userTransaction.gateway_status === 'PENDING') {
         await context.app
             .service('wallet-movements')
             .getModel()
@@ -231,7 +233,7 @@ const processPaymentRecharge = () => async (context) => {
         .service('user-gateway-transactions')
         .getModel()
         .update(
-            { status: TransactionStatus.PROCESSED },
+            { status: TransactionStatus.PROCESSED, gateway_status: transaction.status },
             { where: { gateway_reference: transaction.id } }
         )
 
@@ -274,7 +276,8 @@ module.exports = () => async context => {
         })
 
     if (!gatewayTransaction) throw new NotFound('Transaction not found.')
-    else if (gatewayTransaction.status === TransactionStatus.PROCESSED) throw new NotAcceptable('Transaction already processed.')
+    else if (gatewayTransaction.status === TransactionStatus.PROCESSED && gatewayTransaction.gateway_status === transaction.status)
+        throw new NotAcceptable('Transaction already processed.')
 
     if (gatewayTransaction.type === UserTransactionType.PAYMENT) {
         return await processPaymentOrder()(context)

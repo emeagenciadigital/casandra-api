@@ -338,11 +338,12 @@ const createGatewayPayment = (type) => async ({
 
   let payment = null
 
-  if (!record.payment_method.includes('credit_card')) {
+  const NO_REQUIRED_LONG_POLLING_METHODS = ['credit_card', 'nequi']
+  if (!record.payment_method.some(method => NO_REQUIRED_LONG_POLLING_METHODS.includes(method))) {
     payment = await longPollingData(
       async () => await wompi.getTransaction(transaction.data.id),
       res => {
-        return !!res?.payment_method?.extra?.async_payment_url || ['APPROVED', 'DECLINED', 'VOIDED', 'ERROR'].includes(res?.status)
+        return !!res?.payment_method?.extra?.async_payment_url
       }
     )
   } else {
@@ -358,7 +359,8 @@ const createGatewayPayment = (type) => async ({
       amount: type === 'payment' ? order.total_price - order.amount_paid_from_wallet : record.amount,
       type: type === 'payment' ? UserTransactionType.PAYMENT : UserTransactionType.WALLET_RECHARGE,
       gateway_reference: payment.id,
-      status: payment.status === 'PENDING' ? TransactionStatus.PENDING : TransactionStatus.PROCESSED
+      status: TransactionStatus.PENDING,
+      gateway_status: payment.status,
     })
 
 
@@ -493,7 +495,7 @@ const rechargeOrderFormGatewayMethod = async (args) => {
     .map(getAcceptanceToken)
     .get()
     .then(createGatewayPayment('recharge'))
-    .then(when(paymentIsApproved)(createUserWalletMovement))
+  // .then(when(paymentIsApproved)(createUserWalletMovement))
 }
 
 const getAsyncRequests = async ({ order, urlConfirmation, creditCard, ...otherParams }) => {
@@ -550,7 +552,7 @@ const processOrderPayment = (args) => {
     .then(when(orderIsPaymentFromWallet)(saveOrderPaymentAndConfirm))
     .then(when(isPendingPayment)(payOrderFromGatewayMethod))
     // .then(when(paymentIsRejected)(returnUserAmountWallet))
-    .then(({ context, order, payment, ...otherParams }) => {
+    .then(({ context, order, payment, userGatewayTransaction, ...otherParams }) => {
 
       replaceItems(context, {
         order_id: order.id,
@@ -558,7 +560,8 @@ const processOrderPayment = (args) => {
         ...(payment
           ? {
             gateway_status: payment.status,
-            url_payment: payment.payment_method?.extra?.async_payment_url
+            url_payment: payment.payment_method?.extra?.async_payment_url,
+            user_gateway_transaction_id: userGatewayTransaction.id,
           }
           : {}
         )
@@ -579,13 +582,14 @@ const processWalletRecharge = (args) => {
     .map(getAsyncRequests)
     .get()
     .then(rechargeOrderFormGatewayMethod)
-    .then(({ context, payment, ...otherParams }) => {
+    .then(({ context, payment, userGatewayTransaction, ...otherParams }) => {
       replaceItems(context, {
         status: payment.status,
         ...(payment
           ? {
             gateway_status: payment.status,
-            url_payment: payment.payment_method?.extra?.async_payment_url
+            url_payment: payment.payment_method?.extra?.async_payment_url,
+            user_gateway_transaction_id: userGatewayTransaction.id
           }
           : {}
         )

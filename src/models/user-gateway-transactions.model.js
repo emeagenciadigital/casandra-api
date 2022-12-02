@@ -56,7 +56,10 @@ exports.createModel = (app) => {
         ),
         allowNull: false,
         defaultValue: TransactionStatus.PENDING,
-      }
+      },
+      gateway_status: {
+        type: DataTypes.STRING,
+      },
     },
     {
       paranoid: true,

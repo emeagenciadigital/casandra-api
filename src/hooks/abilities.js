@@ -173,8 +173,7 @@ function defineAbilitiesFor(user, context) {
       can('update', ['users']);
 
       if (user.role === 'user') {
-        // User wallet
-        can(['find'], ['wallet-movements'], { user_id: user.id })
+        can('read', ['wallet-movements', 'user-gateway-transactions'], { user_id: user.id })
       }
 
       if (user.owner_company === 'true') {
