@@ -14,6 +14,7 @@ const joinGet = {
         records.category_2,
         records.category_3,
         records.characteristics,
+        records.is_favorite,
       ] = await Promise.all([
         context.app
           .service("products-media")
@@ -72,6 +73,17 @@ const joinGet = {
             product_id: records.id,
             "products_characteristics.deletedAt": null,
           }),
+        user && context.app
+          .service('favorites')
+          .getModel()
+          .query()
+          .select('id')
+          .where({
+            type_id: records.id,
+            deletedAt: null,
+            user_id: user.id
+          })
+          .then(res => !!res[0])
       ]);
 
       const now = moment().utcOffset(-5)
