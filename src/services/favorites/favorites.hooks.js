@@ -12,6 +12,10 @@ const resolves = {
           service = "products";
           query = { id: records.type_id, deletedAt: null };
           break;
+        case "course":
+          service = 'courses';
+          query = { id: records.type_id }
+          break;
         case "brand":
           service = "brands";
           query = { id: records.type_id, deletedAt: null };
@@ -101,6 +105,45 @@ const resolves = {
             "coffee_shop_products.deletedAt": null,
           })
           .then((it) => it[0]);
+      else if (service === 'courses')
+        records.favorite = await context.app
+          .service(service)
+          .getModel()
+          .findByPk(records.type_id)
+          .then(async course => [
+            course,
+            await context.app
+              .service('products')
+              .getModel()
+              .query()
+              .select(
+                "products.id",
+                "products.name",
+                "products.price",
+                "products.price_with_tax",
+                "products.discount_price",
+                "products.discount_price_whit_tax",
+                "products.status",
+                "products.slug",
+                "products.course",
+                "products_media.type AS type_media",
+                "products_media.path AS main_image",
+                "products_media.id AS products_media_id"
+              )
+              .innerJoin(
+                "products_media",
+                "products.id",
+                "=",
+                "products_media.product_id"
+              )
+              .where({
+                "products.id": course.product_id,
+                "products.deletedAt": null,
+                "products_media.deletedAt": null,
+              })
+              .then((it) => it[0])
+          ])
+          .then(([course, product]) => course.product = product)
     },
   },
 };

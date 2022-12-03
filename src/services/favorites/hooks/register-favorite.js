@@ -2,6 +2,7 @@
 // For more information on hooks see: http://docs.feathersjs.com/api/hooks.html
 const { getItems, replaceItems } = require("feathers-hooks-common");
 const { NotAcceptable, NotFound } = require("@feathersjs/errors");
+const { SEQUELIZE_MODELS } = require("../../../constants");
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
   return async (context) => {
@@ -15,6 +16,10 @@ module.exports = (options = {}) => {
       case "product":
         service = "products";
         query = { id: records.type_id, deletedAt: null };
+        break;
+      case "course":
+        service = 'courses'
+        query = { id: records.type_id }
         break;
       case "brand":
         service = "brands";
@@ -44,12 +49,17 @@ module.exports = (options = {}) => {
         break;
     }
 
-    const item = await context.app
-      .service(service)
-      .getModel()
-      .query()
-      .where(query)
-      .then((it) => it[0]);
+    const item = SEQUELIZE_MODELS.includes(service)
+      ? (await context.app
+        .service(service)
+        .getModel()
+        .findOne(query))
+      : (await context.app
+        .service(service)
+        .getModel()
+        .query()
+        .where(query)
+        .then((it) => it[0]))
 
     if (!item)
       throw new NotFound("No se encontró el item a marcar como favorito.");
