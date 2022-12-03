@@ -12,7 +12,7 @@ const processPaymentOrder = () => async (context) => {
     const STATUS = {
         PENDING: 'pending',
         APPROVED: 'approved',
-        DECLINED: 'rejected',
+        DECLINED: 'failure',
         VOIDED: 'cancelled',
         ERROR: 'failure',
     }
