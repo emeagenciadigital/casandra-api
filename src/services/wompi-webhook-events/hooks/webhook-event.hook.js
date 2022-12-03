@@ -1,6 +1,6 @@
 const { getItems, replaceItems } = require("feathers-hooks-common")
 const crypto = require('crypto')
-const { Forbidden, NotFound, NotAcceptable } = require("@feathersjs/errors")
+const { Forbidden, NotFound } = require("@feathersjs/errors")
 // const { WOMPI_ORDER_STATUS } = require("../../create-process-payment/hooks/gateways-methods/constants")
 const { UserTransactionType, TransactionStatus } = require("../../../models/user-gateway-transactions.model")
 
@@ -44,8 +44,8 @@ const processPaymentOrder = () => async (context) => {
             )
 
         replaceItems(context, {
-            success: true,
-            message: 'Order already processed'
+            success: false,
+            message: 'Order not found.'
         })
         return context
     }
@@ -111,17 +111,32 @@ const processPaymentOrder = () => async (context) => {
     //     })
 
     if (order.amount_paid_from_wallet && ['DECLINED', 'VOIDED', 'ERROR'].includes(transaction.status)) {
-        await context.app
+        const returnExist = await context.app
             .service('wallet-movements')
             .getModel()
-            .create({
-                user_id: order.user_id,
-                type: 'return',
-                amount_net: order.amount_paid_from_wallet,
-                description: `Reembolso de compra ${order.id}`,
-                payment_id: order.id,
-                created_by_user_id: order.user_id,
+            .findOne({
+                attributes: ['id'],
+                where: {
+                    user_id: order.user_id,
+                    type: 'return',
+                    payment_id: order.id,
+                    amount_net: order.amount_paid_from_wallet,
+                    // description: `Reembolso de compra ${order.id}`
+                }
             })
+        if (!returnExist) {
+            await context.app
+                .service('wallet-movements')
+                .getModel()
+                .create({
+                    user_id: order.user_id,
+                    type: 'return',
+                    amount_net: order.amount_paid_from_wallet,
+                    description: `Reembolso de compra ${order.id}`,
+                    payment_id: order.id,
+                    created_by_user_id: order.user_id,
+                })
+        }
     }
 
     await context.app
@@ -275,16 +290,21 @@ module.exports = () => async context => {
             }
         })
 
-    if (!gatewayTransaction) throw new NotFound('Transaction not found.')
-    else if (gatewayTransaction.status === TransactionStatus.PROCESSED && gatewayTransaction.gateway_status === transaction.status)
-        throw new NotAcceptable('Transaction already processed.')
+    if (!gatewayTransaction) {
+        throw new NotFound('Transaction no found.')
+        // replaceItems(context, { success: false, message: 'Transaction no found.' })
+        // return context
+    } else if (gatewayTransaction.status === TransactionStatus.PROCESSED) {
+        replaceItems(context, { success: false, message: 'Transaction already processed.' })
+        return context
+    }
 
     if (gatewayTransaction.type === UserTransactionType.PAYMENT) {
         return await processPaymentOrder()(context)
     } else if (gatewayTransaction.type === UserTransactionType.WALLET_RECHARGE) {
         return await processPaymentRecharge()(context)
     } else {
-        replaceItems(context, { message: 'Method no allowed' })
+        replaceItems(context, { success: false, message: 'Method no allowed' })
     }
 
     return context

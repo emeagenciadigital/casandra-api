@@ -63,6 +63,15 @@ module.exports = (app) => {
         {
           unique: true,
           fields: ['user_id', 'bonus_id']
+        },
+        {
+          unique: true,
+          fields: [
+            'user_id',
+            'type',
+            'payment_id',
+            'amount_net'
+          ]
         }
       ],
       hooks: {
