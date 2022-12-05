@@ -84,7 +84,7 @@ const joinGet = {
             deletedAt: null,
             user_id: user.id
           })
-          .then(res => res[0].id)
+          .then(res => res[0]?.id)
       ]);
 
       const now = moment().utcOffset(-5)
