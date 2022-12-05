@@ -89,6 +89,7 @@ function defineAbilitiesFor(user, context) {
     'contacts-directory-categories',
     'contacts-directory-media',
     'contacts-directory-attributes',
+    'banner-products'
   ]);
 
   can('update', [
