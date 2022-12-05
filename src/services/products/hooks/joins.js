@@ -14,7 +14,7 @@ const joinGet = {
         records.category_2,
         records.category_3,
         records.characteristics,
-        records.is_favorite,
+        // records.is_favorite,
         records.favorite_id,
       ] = await Promise.all([
         context.app
@@ -74,7 +74,7 @@ const joinGet = {
             product_id: records.id,
             "products_characteristics.deletedAt": null,
           }),
-        ...(user ? (context.app
+        user && context.app
           .service('favorites')
           .getModel()
           .query()
@@ -84,8 +84,7 @@ const joinGet = {
             deletedAt: null,
             user_id: user.id
           })
-          .then(res => [!!res[0], res[0].id]))
-          : [])
+          .then(res => res[0].id)
       ]);
 
       const now = moment().utcOffset(-5)
@@ -109,6 +108,7 @@ const joinGet = {
       now.add('days', daysOfShipment)
 
       records.estimated_delivery_date = now.format('DD-MM-YYYY')
+      records.is_favorite = !!records?.favorite_id
     },
   },
 };
