@@ -12,7 +12,7 @@ module.exports = () => async (context) => {
     .getModel()
     .findAll({
       distinct: 'product_id',
-      attributes: ['id'],
+      attributes: ['product_id', 'id'],
       where: {
         user_id: user ? user.id : null,
         off_line_token: query.off_line_token || null
