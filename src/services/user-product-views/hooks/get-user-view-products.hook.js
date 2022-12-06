@@ -11,12 +11,12 @@ module.exports = () => async (context) => {
   const viewIds = await context.app.service('user-product-views')
     .getModel()
     .findAll({
-      distinct: 'product_id',
       attributes: ['product_id', 'id'],
       where: {
         user_id: user ? user.id : null,
         off_line_token: query.off_line_token || null
-      }
+      },
+      group: ['product_id']
     }).then(res => res.map(it => it.id))
 
   context.params.query = { id: { $in: viewIds }, $sort: { id: -1 } }
