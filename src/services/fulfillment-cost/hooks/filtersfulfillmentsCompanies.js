@@ -4,6 +4,7 @@ const { getItems, replaceItems } = require('feathers-hooks-common');
 const { NotAcceptable, NotFound } = require('@feathersjs/errors');
 const calculateVolume = require('../../../hooks/calculate-volume');
 const calculateDataFulfillmentCompany = require('../../../hooks/calculateDataFulfillmentCompany');
+const moment = require('moment')
 // eslint-disable-next-line no-unused-vars
 module.exports = (options = {}) => {
   return async (context) => {
@@ -14,11 +15,11 @@ module.exports = (options = {}) => {
 
     if (!address_id)
       throw new NotAcceptable(
-        'Debes enviar el id de la direccion del usuario.'
+        'Se require la dirección de destino.'
       );
 
     if (!shopping_cart_id)
-      throw new NotAcceptable('Debes enviar el id del carro de compras.');
+      throw new NotAcceptable('Se requiere el carrito de compras.');
 
     const [address, shoppingCart] = await Promise.all([
       context.app
@@ -137,8 +138,32 @@ module.exports = (options = {}) => {
           .where('max', '>=', totalWeight)
           .then((it) => it[0]);
 
-        if (fulfillmentMatrix) fulfillmentMatrix.fulfillmentCompany = company;
-        response.push(fulfillmentMatrix);
+        const now = moment().utcOffset(-5)
+        const limitHourToFastShipment = moment(now)
+          .set('h', 12)
+          .set('m', 0)
+          .set('s', 0)
+          .utcOffset(-5)
+        const weekDay = now.day()
+        const businessDays = [1, 2, 3, 4, 5]
+
+        let daysOfShipment = 0
+        if (now.isBefore(limitHourToFastShipment) || !businessDays.includes(weekDay)) {
+          daysOfShipment = company.min_delivery_days
+        } else {
+          daysOfShipment = company.min_delivery_days + 1
+        }
+
+        if (now.day() === 0) now.add('days', 1)
+        else if (now.day() === 6) now.add('days', 2)
+        now.add('days', daysOfShipment)
+
+
+        if (fulfillmentMatrix) {
+          fulfillmentMatrix.fulfillmentCompany = company;
+          fulfillmentMatrix.estimated_delivery_date = now.format('DD-MM-YYYY')
+          response.push(fulfillmentMatrix);
+        }
       } else {
         if (company.fulfillment_company_id == 2) {
           let servicesCodes = [];

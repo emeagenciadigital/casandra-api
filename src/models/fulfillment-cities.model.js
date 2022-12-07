@@ -16,6 +16,7 @@ class fulfillmentCities extends Model {
         fulfillment_company_id: { type: "integer" },
         location_city_id: { type: "integer" },
         integration_city_id: { type: ["string", "null"] },
+        min_delivery_days: { type: ["integer", "null"], default: null },
       },
     };
   }
@@ -52,6 +53,10 @@ module.exports = function (app) {
               .inTable("locations_cities")
               .index();
             table.string("integration_city_id");
+            table
+              .integer("min_delivery_days")
+              .unsigned()
+              .nullable()
             table.timestamp("deletedAt").nullable();
             table.timestamp("createdAt");
             table.timestamp("updatedAt");
