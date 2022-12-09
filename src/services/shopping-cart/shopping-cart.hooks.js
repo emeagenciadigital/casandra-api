@@ -13,6 +13,7 @@ const {
   isProvider,
   iff,
 } = require('feathers-hooks-common');
+const { getProductPrices } = require('../../utils/price-list/prices');
 
 const switchRegisterShoppingCartBefore = [
   paramsFromClient('shopping_cart_empty'),
@@ -64,6 +65,9 @@ const productsJoins = {
 
       const shopping_cart_details = records.shopping_cart_details;
 
+      const productsPrices = await getProductPrices(context.params.user)(shopping_cart_details.map(it => it.product_id))(context)
+        .then(res => res.reduce((acc, it) => ({ ...acc, [it.product_id]: it }), {}))
+
       if (shopping_cart_details)
         for (let index = 0; index < shopping_cart_details.length; index++) {
           const product = await context.app
@@ -93,9 +97,9 @@ const productsJoins = {
             records.shopping_cart_details[index].product = product;
             if (records.shopping_cart_details[index].product.discount_price) {
               records.shopping_cart_details[index].product.price =
-                records.shopping_cart_details[index].product.discount_price;
+                productsPrices[product.id].discount_price || records.shopping_cart_details[index].product.discount_price;
               records.shopping_cart_details[index].product.price_with_tax =
-                records.shopping_cart_details[
+                productsPrices[product.id].discount_price_whit_tax || records.shopping_cart_details[
                   index
                 ].product.discount_price_whit_tax;
             }
