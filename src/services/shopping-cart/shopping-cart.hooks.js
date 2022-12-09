@@ -95,14 +95,10 @@ const productsJoins = {
             .then((it) => it[0]);
           if (product && product.deletedAt === null) {
             records.shopping_cart_details[index].product = product;
-            if (records.shopping_cart_details[index].product.discount_price) {
-              records.shopping_cart_details[index].product.price =
-                productsPrices[product.id].discount_price || records.shopping_cart_details[index].product.discount_price;
-              records.shopping_cart_details[index].product.price_with_tax =
-                productsPrices[product.id].discount_price_whit_tax || records.shopping_cart_details[
-                  index
-                ].product.discount_price_whit_tax;
-            }
+            records.shopping_cart_details[index].product.price = productsPrices[`${product.id}`].price
+            records.shopping_cart_details[index].product.price_with_tax = productsPrices[`${product.id}`].price_with_tax
+            records.shopping_cart_details[index].product.discount_price = productsPrices[`${product.id}`].discount_price
+            records.shopping_cart_details[index].product.discount_price_whit_tax = productsPrices[`${product.id}`].discount_price_whit_tax
             records.shopping_cart_details[index].product.main_media =
               await context.app
                 .service('products-media')
