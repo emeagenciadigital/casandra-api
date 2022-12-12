@@ -65,10 +65,10 @@ const productsJoins = {
 
       const shopping_cart_details = records.shopping_cart_details;
 
-      const productsPrices = await getProductPrices(context.params.user)(shopping_cart_details.map(it => it.product_id))(context)
-        .then(res => res.reduce((acc, it) => ({ ...acc, [it.product_id]: it }), {}))
 
-      if (shopping_cart_details)
+      if (shopping_cart_details) {
+        const productsPrices = await getProductPrices(context.params.user)(shopping_cart_details.map(it => it.product_id))(context)
+          .then(res => res.reduce((acc, it) => ({ ...acc, [it.product_id]: it }), {}))
         for (let index = 0; index < shopping_cart_details.length; index++) {
           const product = await context.app
             .service('products')
@@ -131,6 +131,8 @@ const productsJoins = {
             records.shopping_cart_details[index].product = null;
           }
         }
+
+      }
     },
   },
 };
