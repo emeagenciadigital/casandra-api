@@ -96,6 +96,7 @@ function defineAbilitiesFor(user, context) {
     'recovery-password',
     'shopping-cart-details',
     'shopping-cart',
+    'user-product-views'
   ]);
   can('remove', ['shopping-cart-details', 'shopping-cart']);
 
