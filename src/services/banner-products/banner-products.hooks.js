@@ -1,3 +1,5 @@
+const { joinWithProduct } = require("./banner-products.joins");
+
 module.exports = {
   before: {
     all: [],
@@ -10,7 +12,7 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [joinWithProduct()],
     find: [],
     get: [],
     create: [],
