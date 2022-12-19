@@ -253,8 +253,6 @@ module.exports = function () {
       throw new NotAcceptable('Se requiere el método de envío')
     }
 
-    if (!Object.keys(fulfillment_company_meta_data).length && requireShipping)
-      throw new NotAcceptable('No se encontró la transportadora.');
 
     fulfillment_company_meta_data.query = {
       totalWeight,
