@@ -269,7 +269,7 @@ module.exports = () => async context => {
     const signature = record.signature
     const timestamp = record.timestamp
 
-    const delay = new Promise((resolve) => setTimeout(resolve, 5000))
+    const delay = () => new Promise((resolve) => setTimeout(resolve, 3000))
 
     await delay()
 
