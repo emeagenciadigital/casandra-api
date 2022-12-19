@@ -25,6 +25,7 @@ module.exports = () => async (context) => {
 
   if (!userCourse) throw new NotFound('User course not found')
   if (!chapter) throw new NotFound('Chapter not found')
+  if (chapter.course_id !== userCourse.course_id) throw new NotAcceptable('El capítulo no pertenece al curso.')
 
   record.meta_course_id = chapter.course_id
   record.time = 0
