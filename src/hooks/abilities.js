@@ -122,8 +122,9 @@ function defineAbilitiesFor(user, context) {
         'wompi-generate-merchant',
         'wompi-pse-banks',
         'user-work-offers',
-        'user-contact-directory'
       ]);
+
+      can('create', ['user-contact-directory'])
 
       can(['create', 'update'], ['wompi-verified-credit-card'])
 
