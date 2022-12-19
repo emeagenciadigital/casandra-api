@@ -39,6 +39,7 @@ function toSequelizeQuery(ability, subject, action) {
 }
 
 function defineAbilitiesFor(user, context) {
+
   const { rules, can, cannot } = AbilityBuilder.extract();
 
   can('read', ['job-sync-integration-products']);
@@ -102,6 +103,7 @@ function defineAbilitiesFor(user, context) {
 
   if (user) {
     if (user.status === 'active') {
+
       //hacer acciones
       can('create', [
         'purchase-orders',
@@ -122,9 +124,8 @@ function defineAbilitiesFor(user, context) {
         'wompi-generate-merchant',
         'wompi-pse-banks',
         'user-work-offers',
+        'user-contact-directory'
       ]);
-
-      can('create', ['user-contact-directory'])
 
       can(['create', 'update'], ['wompi-verified-credit-card'])
 
@@ -260,6 +261,7 @@ module.exports = function authorize(name = null) {
     const serviceName = name || hook.path;
     const ability = defineAbilitiesFor(hook.params.user, hook);
     const throwUnlessCan = (action, resource) => {
+
       if (ability.cannot(action, resource)) {
         throw new Forbidden(`You are not allowed to ${action} ${serviceName}`);
       }
