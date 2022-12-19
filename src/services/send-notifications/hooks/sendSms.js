@@ -20,7 +20,7 @@ module.exports = function (options = {}) {
     switch (records.typeNotification) {
       case "loginSms":
         var params = {
-          Message: `El código es ${records.token}. Este token te permite ingresar a tu cuenta de Apparta. No lo compartas.`,
+          Message: `El código es ${records.token}. Este token te permite ingresar a tu cuenta de Almacén Sandra. No lo compartas.`,
           PhoneNumber: `${records.user.phone_country_code}${records.user.phone}`,
           MessageAttributes: {
             "AWS.SNS.SMS.SenderID": {

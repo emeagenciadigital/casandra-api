@@ -90,6 +90,7 @@ const customerGroupCustomers = require('./customer-group-customers/customer-grou
 const userWorkOffers = require('./user-work-offers/user-work-offers.service')
 const bannerProducts = require('./banner-products/banner-products.service')
 const userCourseChapterViews = require('./user-course-chapter-views/user-course-chapter-views.service')
+const userContactDirectory = require('./user-contact-directory/user-contact-directory.service')
 
 module.exports = function (app) {
   app.configure(users);
@@ -184,4 +185,5 @@ module.exports = function (app) {
   app.configure(userWorkOffers);
   app.configure(bannerProducts);
   app.configure(userCourseChapterViews);
+  app.configure(userContactDirectory)
 };

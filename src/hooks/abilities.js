@@ -121,7 +121,8 @@ function defineAbilitiesFor(user, context) {
         'wompi-tokenize-credit-card',
         'wompi-generate-merchant',
         'wompi-pse-banks',
-        'user-work-offers'
+        'user-work-offers',
+        'user-contact-directory'
       ]);
 
       can(['create', 'update'], ['wompi-verified-credit-card'])
@@ -131,9 +132,18 @@ function defineAbilitiesFor(user, context) {
       can('read', ['custom-payments', 'purchase-orders'], {
         company_id: user.company_id,
       });
-      can('read', ['orders', 'user-work-offers', 'user-courses'], {
-        user_id: user.id,
-      });
+      can(
+        'read',
+        [
+          'orders',
+          'user-work-offers',
+          'user-courses',
+          'user-contact-directory'
+        ],
+        {
+          user_id: user.id,
+        }
+      );
 
       can('read', ['shopping-cart'], {
         company_id: user.company_id,

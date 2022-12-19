@@ -25,5 +25,6 @@ exports.SEQUELIZE_MODELS = [
   'user-work-offers',
   'banner-products',
   'user-courses',
-  'user-course-chapter-views'
+  'user-course-chapter-views',
+  'user-contact-directory'
 ]
