@@ -24,7 +24,7 @@ module.exports = () => async (context) => {
 
   const progress = (chaptersViews / courseChapters * 100).toFixed(0)
 
-  await context.app.service('user-course')
+  await context.app.service('user-courses')
     .getModel()
     .update({ progress: `${progress}%` }, { where: { id: record.user_course_id } })
 
