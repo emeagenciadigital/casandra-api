@@ -1,12 +1,13 @@
-const { iff, isProvider, disallow } = require("feathers-hooks-common");
+const calculateProgressHook = require("./hooks/calculate-progress.hook");
+const createUserChapterView = require("./hooks/create-user-chapter-view");
 
 
 module.exports = {
   before: {
-    all: [iff(isProvider('external'), disallow())],
+    all: [],
     find: [],
     get: [],
-    create: [],
+    create: [createUserChapterView()],
     update: [],
     patch: [],
     remove: [],
@@ -16,7 +17,7 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [calculateProgressHook()],
     update: [],
     patch: [],
     remove: [],
