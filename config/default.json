@@ -7,12 +7,12 @@
     "max": 50
   },
   "wompi": {
-    "public_key": "pub_prod_i8bBiMVDKCyU3h4O5bdTWCvinljZYmeZ",
-    "private_key": "prv_prod_hqgRaIzNAn71TDM2nQhXYEWSxM5wlYaw",
-    "events_secret": "prod_events_F96mv1Uz7WVRmbYaMLeZRAdfe1Wx2RLF",
-    "integrity_secret": "prod_integrity_TKv2rgSCkVHR8ZvtB9RYjj10t2ct6KBT",
-    "url_base": "https://production.wompi.co/v1",
-    "test": "false"
+    "public_key": "pub_test_a3o90JpFnte5M3dUsRD26kS3yw0EUeZh",
+    "private_key": "prv_test_CPHnp9aYh6w94bmojHrK1xMAEQPrn1i8",
+    "events_secret": "test_events_OpCOlNiXSZkfNsH9cCsHspoqod2JiV8C",
+    "integrity_secret": "test_integrity_cyJHgzh70I9qN6Q4zZDmW9ze1JN3XXQS",
+    "url_base": "https://sandbox.wompi.co/v1",
+    "test": "true"
   },
   "algolia": {
     "appId": "87PMVY6KUZ_deprecated",
