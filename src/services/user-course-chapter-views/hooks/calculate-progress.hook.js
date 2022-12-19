@@ -3,7 +3,7 @@ const { getItems } = require("feathers-hooks-common")
 module.exports = () => async (context) => {
   const record = getItems(context)
 
-  if (record.context !== 'viewed') return context
+  if (record.status !== 'viewed') return context
 
   const [chaptersViews, courseChapters] = await Promise.all([
     context.app.service('user-course-chapter-views')
