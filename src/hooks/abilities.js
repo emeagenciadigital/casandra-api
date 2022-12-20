@@ -142,7 +142,8 @@ function defineAbilitiesFor(user, context) {
           'user-work-offers',
           'user-courses',
           'user-contact-directory',
-          'user-payments'
+          'user-payments',
+          'user-gateway-transactions'
         ],
         {
           user_id: user.id,

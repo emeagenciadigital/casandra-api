@@ -59,7 +59,7 @@ module.exports = (app) => {
   )
 
   //   sequelizeClient.query(`
-  //   create view user_payments as
+  //     create view user_payments as
   // select payments.*
   // from (select row_number() over () as id, pp.*
   //       from (select wallet_movements.user_id,
@@ -71,7 +71,7 @@ module.exports = (app) => {
   //                    orders.amount_paid_from_gateway,
   //                    orders.amount_paid_from_wallet,
   //                    orders.payment_meta_data,
-  //                    'approved' as status
+  //                    cast('approved' as varchar(100)) as status
   //             from wallet_movements
   //                      left join orders on wallet_movements.payment_id = orders.id and wallet_movements.type = 'payment'
 
@@ -79,28 +79,29 @@ module.exports = (app) => {
 
   //             union all
   //             select orders.user_id,
-  //                    'payment'                                                  as type,
-  //                    orders.total_price                                         as amount_net,
-  //                    concat('Compra #', orders.id)                              as description,
+  //                    cast('payment' as varchar(100)) as type,
+  //                    orders.total_price              as amount_net,
+  //                    concat('Compra #', orders.id)   as description,
   //                    orders.createdAt,
   //                    orders.updatedAt,
-  //                    orders.total_price                                         as amount_paid_from_gateway,
-  //                    0                                                          as amount_paid_from_wallet,
+  //                    orders.total_price              as amount_paid_from_gateway,
+  //                    0                               as amount_paid_from_wallet,
   //                    orders.payment_meta_data,
-  //                    case
-  //                        when orders.order_status_id in (3, 5, 6, 7, 8, 9) then 'approved'
-  //                        when orders.order_status_id in (1, 4) then 'pending'
-  //                        when orders.order_status_id in (13) then 'error'
-  //                        when orders.order_status_id in (2) then 'rejected' end as status
+  //                    cast(
+  //                            case
+  //                                when orders.order_status_id in (3, 5, 6, 7, 8, 9) then 'approved'
+  //                                when orders.order_status_id in (1, 4) then 'pending'
+  //                                when orders.order_status_id in (13) then 'error'
+  //                                when orders.order_status_id in (2) then 'rejected' end as varchar(100)
+  //                        )                           as status
   //             from orders
   //             where orders.order_status_id in (3, 5, 6, 7, 8, 9)
   //                 and orders.deletedAt is null
-
   //                 and orders.amount_paid_from_wallet is null
   //                or orders.amount_paid_from_wallet = 0) as pp
   //       order by pp.createdAt asc) as payments
   // order by payments.createdAt asc
-  //   `)
+  //     `)
 
   return userPayments
 }

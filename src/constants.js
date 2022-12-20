@@ -27,5 +27,6 @@ exports.SEQUELIZE_MODELS = [
   'user-courses',
   'user-course-chapter-views',
   'user-contact-directory',
-  'user-payments'
+  'user-payments',
+  'user-gateway-transactions',
 ]
