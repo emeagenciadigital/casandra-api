@@ -85,11 +85,11 @@ exports.joinWithUserCourses = () => (context) => {
   return fastJoin({
     joins: {
       join: () => async (record) => {
-        record.bought = await context.app
+        record.user_course = await context.app
           .service('user-courses')
           .getModel()
           .findOne({ where: { course_id: record.id, user_id: user.id } })
-          .then((res) => !!res)
+        record.bought = !!record.user_course
       }
     }
   })(context)
