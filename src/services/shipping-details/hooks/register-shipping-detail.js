@@ -17,6 +17,8 @@ module.exports = (options = {}) => {
     if (records.quantity <= 0)
       throw new NotAcceptable("Debes enviar una cantidad valida.");
 
+    if (!records.shipping_id) throw new NotAcceptable('Debes enviar el shipping_id')
+
     orderDetail = await context.app
       .service("orders-details")
       .getModel()
