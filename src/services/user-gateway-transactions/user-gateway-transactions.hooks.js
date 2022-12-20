@@ -5,7 +5,7 @@ module.exports = {
   before: {
     all: [],
     find: [],
-    get: [iff(isProvider('external'), restrict())],
+    get: [],
     create: [iff(isProvider('external'), restrict())],
     update: [iff(isProvider('external'), restrict())],
     patch: [iff(isProvider('external'), restrict())],
