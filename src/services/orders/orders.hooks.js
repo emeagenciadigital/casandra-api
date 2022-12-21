@@ -6,7 +6,7 @@ const searchAdmin = require('./hooks/search-admin');
 // const discountStock = require('./hooks/discount-stock');
 const processPaymentCredit = require('./hooks/process-payment-credit');
 const approvalOrderOwnerCompany = require('./hooks/approval-order-owner-company');
-const { fastJoin } = require('feathers-hooks-common');
+const { fastJoin, discard } = require('feathers-hooks-common');
 
 const ordersJoin = {
   joins: {
@@ -110,7 +110,13 @@ module.exports = {
     all: [],
     find: [searchAdmin()],
     get: [searchAdmin()],
-    create: [registerOrders()],
+    create: [
+      discard(
+        'amount_paid_from_wallet',
+        'amount_paid_from_gateway'
+      ),
+      registerOrders()
+    ],
     update: [],
     patch: [approvalOrderOwnerCompany()],
     remove: [],
