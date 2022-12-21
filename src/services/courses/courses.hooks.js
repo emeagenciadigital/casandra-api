@@ -17,6 +17,7 @@ module.exports = {
   after: {
     all: [syncMeilisearchHook()],
     find: [
+      joinWithUserCourses(),
       courseDetailJoin(),
       courseProductJoin()
     ],
