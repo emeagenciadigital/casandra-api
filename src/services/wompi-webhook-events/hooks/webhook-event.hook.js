@@ -80,7 +80,7 @@ const processPaymentOrder = (gatewayTransaction) => async (context) => {
         address: `${transaction.shipping_address.address_line_1} - ${transaction.shipping_address.address_line_2}`,
         payment_method: transaction.payment_method_type,
         user_gateway_transaction_id: gatewayTransaction.id,
-        meta_gateway_response_json: JSON.parse(transaction || {}),
+        meta_gateway_response_json: JSON.stringify(transaction || {}),
     }
 
     const [paymentConfirmationCreated] = await Promise.all([
@@ -227,7 +227,7 @@ const processPaymentRecharge = (gatewayTransaction) => async (context) => {
         address: `${transaction.shipping_address?.address_line_1} - ${transaction.shipping_address?.address_line_2}`,
         payment_method: transaction.payment_method_type,
         user_gateway_transaction_id: gatewayTransaction.id,
-        meta_gateway_response_json: JSON.parse(transaction || {}),
+        meta_gateway_response_json: JSON.stringify(transaction || {}),
     }
 
     const paymentConfirmationCreated = await context.app

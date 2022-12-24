@@ -10,7 +10,7 @@ const ID_URL_CONFIRMATION = 1
 const gatewayMethodIs = (method) => ({ record }) => record.payment_method.includes(method)
 const isPendingPayment = ({ order }) => order.amount_paid_from_wallet < order.total_price
 const orderIsPaymentFromWallet = ({ order }) => order.amount_paid_from_wallet >= order.total_price
-const paymentIsApproved = ({ payment }) => payment.status === 'APPROVED'
+// const paymentIsApproved = ({ payment }) => payment.status === 'APPROVED'
 // eslint-disable-next-line no-unused-vars
 const paymentIsRejected = (({ payment }) => payment && payment.status !== 'APPROVED' && payment.status !== 'PENDING')
 
@@ -386,7 +386,7 @@ const createGatewayPayment = (type) => async ({
       address: `${payment?.shipping_address?.address_line_1} - ${payment.shipping_address?.address_line_2}`,
       payment_method: payment.payment_method_type,
       user_gateway_transaction_id: userGatewayTransaction.id,
-      meta_gateway_response_json: JSON.parse(payment),
+      meta_gateway_response_json: JSON.stringify(payment),
     })
 
   if (type === 'payment') {
@@ -432,63 +432,63 @@ const payOrderFromGatewayMethod = async (args) => {
     })
 }
 
-const createUserWalletMovement = async ({
-  context,
-  user,
-  payment,
-  userGatewayTransaction,
-  ...restParams
-}) => {
-  const wompi = context.app.get('wompiClient')
-  const paymentConfirmation = {
-    user_id: user.id,
-    payment_reference: payment.id,
-    invoice: '',
-    description: '',
-    value: userGatewayTransaction.amount,
-    tax: 0,
-    dues: payment?.payment_method?.installments || 0,
-    currency: 'COP',
-    bank: payment.payment_method_type,
-    status: payment.status,
-    response: payment.status,
-    gateway: 'wompi',
-    date: payment.created_at,
-    type_document: '',
-    document: '',
-    name: payment?.payment_method?.extra?.card_holder || '',
-    in_tests: wompi.isTest,
-    city: payment?.shipping_address?.city || '',
-    address: `${payment.shipping_address?.address_line_1} - ${payment.shipping_address?.address_line_2}`,
-    payment_method: payment.payment_method_type
-  }
+// const createUserWalletMovement = async ({
+//   context,
+//   user,
+//   payment,
+//   userGatewayTransaction,
+//   ...restParams
+// }) => {
+//   const wompi = context.app.get('wompiClient')
+//   const paymentConfirmation = {
+//     user_id: user.id,
+//     payment_reference: payment.id,
+//     invoice: '',
+//     description: '',
+//     value: userGatewayTransaction.amount,
+//     tax: 0,
+//     dues: payment?.payment_method?.installments || 0,
+//     currency: 'COP',
+//     bank: payment.payment_method_type,
+//     status: payment.status,
+//     response: payment.status,
+//     gateway: 'wompi',
+//     date: payment.created_at,
+//     type_document: '',
+//     document: '',
+//     name: payment?.payment_method?.extra?.card_holder || '',
+//     in_tests: wompi.isTest,
+//     city: payment?.shipping_address?.city || '',
+//     address: `${payment.shipping_address?.address_line_1} - ${payment.shipping_address?.address_line_2}`,
+//     payment_method: payment.payment_method_type
+//   }
 
-  const paymentConfirmationCreated = await context.app
-    .service('payment-confirmations')
-    .create(paymentConfirmation)
+//   const paymentConfirmationCreated = await context.app
+//     .service('payment-confirmations')
+//     .create(paymentConfirmation)
 
-  if (payment.status === 'APPROVED') {
-    await context.app
-      .service('wallet-movements')
-      .getModel()
-      .create({
-        user_id: user.id,
-        type: 'recharge',
-        amount_net: userGatewayTransaction.amount,
-        description: `Recarga wallet`,
-        payment_id: paymentConfirmationCreated.id,
-        created_by_user_id: user.id,
-      })
-  }
+//   if (payment.status === 'APPROVED') {
+//     await context.app
+//       .service('wallet-movements')
+//       .getModel()
+//       .create({
+//         user_id: user.id,
+//         type: 'recharge',
+//         amount_net: userGatewayTransaction.amount,
+//         description: `Recarga wallet`,
+//         payment_id: paymentConfirmationCreated.id,
+//         created_by_user_id: user.id,
+//       })
+//   }
 
-  return {
-    context,
-    user,
-    payment,
-    userGatewayTransaction,
-    ...restParams
-  }
-}
+//   return {
+//     context,
+//     user,
+//     payment,
+//     userGatewayTransaction,
+//     ...restParams
+//   }
+// }
 
 const rechargeOrderFormGatewayMethod = async (args) => {
   return Container.from(args)

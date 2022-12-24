@@ -58,8 +58,8 @@ module.exports = (app) => {
     }
   )
 
-  //   sequelizeClient.query(`
-  //     create view user_payments as
+  // sequelizeClient.query(`
+  // create view user_payments as
   // select payments.*
   // from (select row_number() over () as id, pp.*
   //       from (select wallet_movements.user_id,
@@ -70,10 +70,13 @@ module.exports = (app) => {
   //                    wallet_movements.updatedAt,
   //                    orders.amount_paid_from_gateway,
   //                    orders.amount_paid_from_wallet,
-  //                    orders.payment_meta_data,
-  //                    cast('approved' as varchar(100)) as status
+  //                    ifnull(orders.payment_meta_data,
+  //                           payment_confirmations.meta_gateway_response_json) as payment_meta_data,
+  //                    cast('approved' as varchar(100))                         as status
   //             from wallet_movements
   //                      left join orders on wallet_movements.payment_id = orders.id and wallet_movements.type = 'payment'
+  //                      left join payment_confirmations on wallet_movements.payment_id = payment_confirmations.id and
+  //                                                         wallet_movements.type = 'recharge'
 
   //             where wallet_movements.deletedAt is null
 
@@ -101,7 +104,7 @@ module.exports = (app) => {
   //                or orders.amount_paid_from_wallet = 0) as pp
   //       order by pp.createdAt asc) as payments
   // order by payments.createdAt asc
-  //     `)
+  //   `)
 
   return userPayments
 }
