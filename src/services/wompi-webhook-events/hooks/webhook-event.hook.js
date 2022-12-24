@@ -4,7 +4,7 @@ const { Forbidden, NotFound } = require("@feathersjs/errors")
 // const { WOMPI_ORDER_STATUS } = require("../../create-process-payment/hooks/gateways-methods/constants")
 const { UserTransactionType, TransactionStatus } = require("../../../models/user-gateway-transactions.model")
 
-const processPaymentOrder = () => async (context) => {
+const processPaymentOrder = (gatewayTransaction) => async (context) => {
     const wompi = context.app.get('wompiClient')
     const record = getItems(context)
     const transaction = record.data.transaction
@@ -78,7 +78,9 @@ const processPaymentOrder = () => async (context) => {
         in_tests: wompi.isTest,
         city: transaction.shipping_address.city,
         address: `${transaction.shipping_address.address_line_1} - ${transaction.shipping_address.address_line_2}`,
-        payment_method: transaction.payment_method_type
+        payment_method: transaction.payment_method_type,
+        user_gateway_transaction_id: gatewayTransaction.id,
+        meta_gateway_response_json: JSON.parse(transaction || {}),
     }
 
     const [paymentConfirmationCreated] = await Promise.all([
@@ -156,7 +158,7 @@ const processPaymentOrder = () => async (context) => {
     return context
 }
 
-const processPaymentRecharge = () => async (context) => {
+const processPaymentRecharge = (gatewayTransaction) => async (context) => {
     const wompi = context.app.get('wompiClient')
     const record = getItems(context)
     const transaction = record.data.transaction
@@ -164,7 +166,7 @@ const processPaymentRecharge = () => async (context) => {
 
     const userId = JSON.parse(Buffer.from(transaction.reference, 'base64').toString('ascii')).user_id
 
-    const [user, userTransaction] = await Promise.all([
+    const [user] = await Promise.all([
         context.app.service('users')
             .getModel()
             .query()
@@ -174,11 +176,11 @@ const processPaymentRecharge = () => async (context) => {
                 status: 'active'
             })
             .then(it => it[0]),
-        context.app.service('user-gateway-transactions')
-            .getModel()
-            .findOne({
-                where: { gateway_reference: transaction.id, user_id: userId }
-            })
+        // context.app.service('user-gateway-transactions')
+        //     .getModel()
+        //     .findOne({
+        //         where: { gateway_reference: transaction.id, user_id: userId }
+        //     })
     ])
 
     if (!user) {
@@ -208,7 +210,7 @@ const processPaymentRecharge = () => async (context) => {
         payment_reference: transaction.id,
         invoice: '',
         description: '',
-        value: userTransaction.amount,
+        value: gatewayTransaction.amount,
         tax: 0,
         dues: transaction?.payment_method?.installments || 0,
         currency: 'COP',
@@ -223,25 +225,29 @@ const processPaymentRecharge = () => async (context) => {
         in_tests: wompi.isTest,
         city: transaction?.shipping_address?.city || '',
         address: `${transaction.shipping_address?.address_line_1} - ${transaction.shipping_address?.address_line_2}`,
-        payment_method: transaction.payment_method_type
+        payment_method: transaction.payment_method_type,
+        user_gateway_transaction_id: gatewayTransaction.id,
+        meta_gateway_response_json: JSON.parse(transaction || {}),
     }
 
     const paymentConfirmationCreated = await context.app
         .service('payment-confirmations')
         .create(paymentConfirmation)
 
-    if (transaction.status === 'APPROVED' && userTransaction.gateway_status === 'PENDING') {
-        await context.app
+    if (transaction.status === 'APPROVED' && gatewayTransaction.gateway_status === 'PENDING') {
+        const walletMovement = await context.app
             .service('wallet-movements')
             .getModel()
             .create({
                 user_id: user.id,
                 type: 'recharge',
-                amount_net: userTransaction.amount,
+                amount_net: gatewayTransaction.amount,
                 description: `Recarga wallet`,
                 payment_id: paymentConfirmationCreated.id,
                 created_by_user_id: user.id,
             })
+        await context.app.service('payment-confirmations')
+            .patch(paymentConfirmationCreated.id, { wallet_movement_id: walletMovement.id })
     }
 
     await context.app
@@ -304,9 +310,9 @@ module.exports = () => async context => {
     }
 
     if (gatewayTransaction.type === UserTransactionType.PAYMENT) {
-        return await processPaymentOrder()(context)
+        return await processPaymentOrder(gatewayTransaction)(context)
     } else if (gatewayTransaction.type === UserTransactionType.WALLET_RECHARGE) {
-        return await processPaymentRecharge()(context)
+        return await processPaymentRecharge(gatewayTransaction)(context)
     } else {
         replaceItems(context, { success: false, message: 'Method no allowed' })
     }

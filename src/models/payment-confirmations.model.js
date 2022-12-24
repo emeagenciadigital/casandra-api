@@ -45,7 +45,8 @@ class paymentConfirmations extends Model {
         deletedAt: { type: 'string', format: 'date-time' },
         wallet_movement_id: { type: 'integer' },
         user_id: { type: 'integer' },
-        user_gateway_transaction_id: { type: 'integer' }
+        user_gateway_transaction_id: { type: 'integer' },
+        meta_gateway_response_json: { type: ['string', 'null'] },
       },
     };
   }
@@ -99,6 +100,7 @@ module.exports = function (app) {
             table.string('email');
             table.string('city');
             table.string('address');
+            table.string('meta_gateway_response_json').nullable()
             table.string('ind_country');
             table.integer('shipping_id');
             table.timestamp('deletedAt').nullable();

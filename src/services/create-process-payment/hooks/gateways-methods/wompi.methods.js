@@ -367,7 +367,7 @@ const createGatewayPayment = (type) => async ({
   const paymentConfirmationCreated = await context.app
     .service('payment-confirmations')
     .create({
-      ...(type === 'payment' ? { order_id: order.id } : { user_gateway_transaction_id: userGatewayTransaction.id }),
+      ...(type === 'payment' ? { order_id: order.id } : {}),
       user_id: user.id,
       payment_reference: payment.id,
       invoice: '',
@@ -384,7 +384,9 @@ const createGatewayPayment = (type) => async ({
       in_tests: wompi.isTest,
       city: payment?.shipping_address?.city || '',
       address: `${payment?.shipping_address?.address_line_1} - ${payment.shipping_address?.address_line_2}`,
-      payment_method: payment.payment_method_type
+      payment_method: payment.payment_method_type,
+      user_gateway_transaction_id: userGatewayTransaction.id,
+      meta_gateway_response_json: JSON.parse(payment),
     })
 
   if (type === 'payment') {
