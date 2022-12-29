@@ -53,7 +53,7 @@ module.exports = (options = {}) => {
 
       if (shippingDetails < 1)
         throw new NotAcceptable(
-          "Para enviar un envio, el envio debe contener productos dentro."
+          "Para enviar un envío, el envío debe contener productos dentro."
         );
 
       context.shippingDetails = shippingDetails;

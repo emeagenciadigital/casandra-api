@@ -83,7 +83,12 @@ class EmailStrategy extends LocalStrategy {
       );
     }
 
-    const currentUser = (await UserModel.where({ email: records.email, token_login_email: records.token_login_email }))[0];
+    const currentUser = await this.app.service('users')
+      .find({
+          query: { email: records.email, token_login_email: records.token_login_email },
+          paginate: false
+      })
+      .then(res => res[0])  
 
     if (!currentUser) {
       throw new NotAuthenticated('Usuario o contraseña invalidos.');

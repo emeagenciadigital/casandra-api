@@ -90,12 +90,13 @@ class SmsStrategy extends LocalStrategy {
 
     const currentUser = await this.app
       .service("users")
-      .getModel()
-      .query()
-      .where({
-        phone: records.phone,
-        token_login_phone: records.token_login_phone,
-        phone_country_code: records.phone_country_code,
+      .find({
+        query: {
+          phone: records.phone,
+          token_login_phone: records.token_login_phone,
+          phone_country_code: records.phone_country_code,
+        },
+        paginate: false
       })
       .then((it) => it[0]);
 
