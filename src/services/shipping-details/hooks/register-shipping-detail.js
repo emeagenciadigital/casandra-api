@@ -69,7 +69,7 @@ module.exports = (options = {}) => {
 
     if (shippingDetails)
       throw new NotAcceptable(
-        "Este producto ya se encuenta agregado al envio."
+        "Este producto ya se encuentra agregado al envío."
       );
 
     const sumDetailsInPreparation = await context.app
