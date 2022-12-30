@@ -46,7 +46,7 @@ module.exports = (options = {}) => {
         .where({ deletedAt: null })
         .then(products => products.reduce((acc, it) => ({ ...acc, [it.id]: it})))
 
-      const productCoursesIds = orderProducts
+      const productCoursesIds = Object.values(orderProducts)
         .filter(product => product.course === 'true')
         .map(product => product.id)
       

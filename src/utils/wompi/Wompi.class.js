@@ -10,7 +10,7 @@ module.exports = class Wompi {
         this.privKey = config.private_key
         this.eventsSecret = config.events_secret
         this.integritySecret = config.integrity_secret
-        this.isTest = config.test
+        this.isTest = config.test === 'true'
         this.fetch = this._configureAxios()
     }
 
