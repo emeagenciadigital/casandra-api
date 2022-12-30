@@ -44,7 +44,7 @@ module.exports = (options = {}) => {
         .query()
         .whereIn('id', orderDetails.map(it => it.product_id))
         .where({ deletedAt: null })
-        .then(products => products.reduce((acc, it) => ({ ...acc, [it.id]: it})))
+        .then(products => products.reduce((acc, it) => ({ ...acc, [it.id]: it}), {}))
 
       const productCoursesIds = Object.values(orderProducts)
         .filter(product => product.course === 'true')
@@ -71,7 +71,7 @@ module.exports = (options = {}) => {
               groupedCourses[course.product_id] = [course]
             }
             return groupedCourses
-          })
+          }, {})
         })
 
       }
