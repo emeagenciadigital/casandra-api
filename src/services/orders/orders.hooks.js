@@ -42,7 +42,9 @@ const ordersJoin = {
               'order_history.createdAt AS createdAt',
               'order_history.order_id',
               'orders_status.name',
-              'orders_status.id AS orders_status_id'
+              'orders_status.id AS orders_status_id',
+              'orders_status.status_code',
+              'orders_status.color'
             )
             .innerJoin(
               'orders_status',
