@@ -277,7 +277,7 @@ module.exports = () => async context => {
 
     const delay = () => new Promise((resolve) => setTimeout(resolve, 3000))
 
-    if (wompi.isTest) await delay()
+    if (wompi.getIsTest()) await delay()
 
     const checksum = crypto.createHash('sha256')
         .update(signature.properties.reduce((acc, it) => acc += it.split('.').reduce((acc2, it2) => {
