@@ -76,7 +76,7 @@ module.exports = (options = {}) => {
 
       }
 
-       isOrderCompleted = orderProducts.every(product => product.course === 'true')
+       isOrderCompleted = Object.values(orderProducts).every(product => product.course === 'true')
 
       for (const key in orderDetails) {
         const orderDetail = orderDetails[key];
